@@ -1236,7 +1236,7 @@ main {
 .wallet-summary {
   display: grid;
   margin-bottom: 26px;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 18px;
 }
 
@@ -1257,6 +1257,11 @@ main {
 .wallet-stat:nth-child(3) {
   color: var(--ink);
   background: #e8d8c6;
+}
+
+.wallet-stat:nth-child(4) {
+  color: var(--paper);
+  background: #4c7b78;
 }
 
 .wallet-stat span,
@@ -1319,6 +1324,25 @@ main {
   font-size: 11px;
 }
 
+.budget-category-numbers {
+  display: flex;
+  margin-bottom: 9px;
+  color: var(--muted);
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 10px;
+}
+
+.budget-category-numbers strong {
+  color: var(--ink);
+  font-size: 11px;
+}
+
+.budget-category-numbers .is-over,
+.budget-category-numbers .is-over strong {
+  color: #b34f32;
+}
+
 .budget-track {
   overflow: hidden;
   height: 8px;
@@ -1336,6 +1360,21 @@ main {
   margin: 7px 0 0;
   color: #b34f32;
   font-size: 10px;
+}
+
+.category-expense-button {
+  margin-top: 10px;
+  padding: 0;
+  border: 0;
+  color: var(--green);
+  background: transparent;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.category-expense-button:hover {
+  color: var(--terracotta);
 }
 
 .expense-list {
@@ -1404,6 +1443,62 @@ main {
   color: var(--muted);
   text-align: center;
   font-size: 12px;
+}
+
+.fixed-cost-panel {
+  margin-top: 26px;
+  padding: clamp(22px, 4vw, 30px);
+}
+
+.fixed-cost-panel summary {
+  display: flex;
+  cursor: pointer;
+  list-style: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.fixed-cost-panel summary::-webkit-details-marker {
+  display: none;
+}
+
+.fixed-cost-panel summary span small,
+.fixed-cost-panel summary span strong {
+  display: block;
+}
+
+.fixed-cost-panel summary span small {
+  margin-bottom: 5px;
+  color: var(--muted);
+  letter-spacing: 0.12em;
+  font-size: 9px;
+}
+
+.fixed-cost-panel summary > strong {
+  font-family: Georgia, serif;
+  font-size: 20px;
+}
+
+.fixed-cost-list {
+  display: grid;
+  margin-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.fixed-cost-row {
+  display: flex;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 11px;
+}
+
+.fixed-cost-panel > p {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 10px;
 }
 
 .weather-hero {
@@ -1621,6 +1716,17 @@ main {
   gap: 7px;
 }
 
+.form-hint {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.form-hint.is-over {
+  color: #b34f32;
+}
+
 .modal input,
 .modal select,
 .modal textarea {
@@ -1817,6 +1923,10 @@ main {
 
   .wallet-grid {
     grid-template-columns: 1fr;
+  }
+
+  .wallet-summary {
+    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -2090,6 +2200,11 @@ main {
     grid-template-columns: auto minmax(0, 1fr) auto;
   }
 
+  .budget-category-numbers,
+  .fixed-cost-row {
+    align-items: flex-start;
+  }
+
   .expense-amount {
     overflow-wrap: anywhere;
   }
@@ -2313,7 +2428,7 @@ main {
             <p class="eyebrow">PLAN</p>
             <h2 id="plan-modal-title">新增行程</h2>
           </div>
-          <button class="close-button" value="cancel" type="submit" aria-label="关闭">×</button>
+          <button class="close-button" value="cancel" type="submit" formnovalidate aria-label="关闭">×</button>
         </div>
         <input type="hidden" name="itemId" />
         <label>日期
@@ -2346,7 +2461,7 @@ main {
         <div class="modal-actions">
           <button class="danger-text" id="delete-plan-button" type="button" hidden>删除</button>
           <span class="modal-spacer"></span>
-          <button class="secondary-button" value="cancel" type="submit">取消</button>
+          <button class="secondary-button" value="cancel" type="submit" formnovalidate>取消</button>
           <button class="primary-button" value="default" type="submit">保存行程</button>
         </div>
       </form>
@@ -2359,7 +2474,7 @@ main {
             <p class="eyebrow">NEW EXPENSE</p>
             <h2>记一笔花费</h2>
           </div>
-          <button class="close-button" value="cancel" type="submit" aria-label="关闭">×</button>
+          <button class="close-button" value="cancel" type="submit" formnovalidate aria-label="关闭">×</button>
         </div>
         <div class="amount-field">
           <span>RM</span>
@@ -2367,6 +2482,7 @@ main {
         </div>
         <label>类别
           <select name="category" id="expense-category" required></select>
+          <small class="form-hint" id="expense-budget-hint"></small>
         </label>
         <label>日期
           <input name="date" type="date" required />
@@ -2376,7 +2492,7 @@ main {
         </label>
         <div class="modal-actions">
           <span class="modal-spacer"></span>
-          <button class="secondary-button" value="cancel" type="submit">取消</button>
+          <button class="secondary-button" value="cancel" type="submit" formnovalidate>取消</button>
           <button class="primary-button" value="default" type="submit">保存花费</button>
         </div>
       </form>
@@ -2562,18 +2678,30 @@ const defaultDays = [
   }
 ];
 
-const defaultBudgets = [
-  { id: "fixed", name: "机票 / 住宿 / 租车 / 保险", shortName: "固定费用", limit: 12854, color: "#d47745" },
-  { id: "food", name: "餐饮与咖啡", shortName: "餐饮", limit: 2500, color: "#b79557" },
-  { id: "transport", name: "油费 / 过路费 / 停车", shortName: "交通", limit: 1000, color: "#657f76" },
-  { id: "activity", name: "Venice 与活动", shortName: "活动", limit: 800, color: "#677f9e" },
-  { id: "shopping", name: "购物预留", shortName: "购物", limit: 3000, color: "#a46d7b" },
-  { id: "emergency", name: "紧急备用金", shortName: "备用金", limit: 1500, color: "#7e7b72" }
+const defaultFixedCosts = [
+  { id: "flight", name: "机票", amount: 5290 },
+  { id: "emirates-seat", name: "Emirates 选位", amount: 900 },
+  { id: "hotel-al-seef", name: "Al Seef Heritage Hotel Dubai", amount: 315.95 },
+  { id: "hotel-passo-tre-croci", name: "B&B Hotel Passo Tre Croci Cortina", amount: 667.75 },
+  { id: "hotel-misurina", name: "Grand Hotel Misurina", amount: 829.76 },
+  { id: "hotel-gerharts", name: "Gerharts Premium City Living（2晚）", amount: 1665.85 },
+  { id: "hotel-anda", name: "Anda Venice Hostel", amount: 455.40 },
+  { id: "hotel-ibis-dubai", name: "Ibis Styles Dubai Airport", amount: 181.99 },
+  { id: "hotel-tax", name: "酒店税", amount: 77 },
+  { id: "car-rental", name: "租车", amount: 2150.93 },
+  { id: "insurance", name: "保险", amount: 521.25 }
 ];
 
-const defaultExpenses = [
-  { id: "expense-fixed", date: "2026-06-12", category: "fixed", amount: 12854, note: "已预订固定费用" }
+const defaultBudgets = [
+  { id: "food", name: "食物与咖啡", shortName: "食物", limit: 2000, color: "#b79557" },
+  { id: "fuel", name: "油费", shortName: "油费", limit: 300, color: "#657f76" },
+  { id: "parking", name: "停车", shortName: "停车", limit: 507.60, color: "#6e8d86" },
+  { id: "cable-car", name: "缆车", shortName: "缆车", limit: 1363, color: "#677f9e" },
+  { id: "braies-boat", name: "Lago di Braies Boat", shortName: "Braies Boat", limit: 305.50, color: "#4c7b78" },
+  { id: "gondola", name: "Venice Gondola", shortName: "Gondola", limit: 517, color: "#a46d7b" }
 ];
+
+const defaultExpenses = [];
 
 const weatherLocations = {
   dubai: { name: "Dubai", label: "迪拜", latitude: 25.2048, longitude: 55.2708, timezone: "Asia/Dubai", typical: "28-38°C", note: "炎热干燥，室内冷气较强" },
@@ -2590,8 +2718,8 @@ const bookingReminders = [
   { title: "Venice Gondola", detail: "19:00 属夜间时段，价格与上船点出发前确认", status: "出发前复查", date: "9月26日" }
 ];
 
-
 const STORAGE_KEY = "via26-state-v1";
+const STATE_VERSION = 2;
 const WEATHER_KEY = "via26-weather-v1";
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
@@ -2617,7 +2745,9 @@ const escapeHtml = value =>
 
 function loadState() {
   const fallback = {
+    version: STATE_VERSION,
     days: clone(defaultDays),
+    fixedCosts: clone(defaultFixedCosts),
     budgets: clone(defaultBudgets),
     expenses: clone(defaultExpenses),
     completed: []
@@ -2626,10 +2756,30 @@ function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
     if (!saved || !Array.isArray(saved.days)) return fallback;
+
+    const currentBudgetIds = new Set(defaultBudgets.map(budget => budget.id));
+    const migratedExpenses = Array.isArray(saved.expenses)
+      ? saved.expenses
+          .filter(expense => expense.id !== "expense-fixed" && expense.category !== "fixed")
+          .map(expense => {
+            if (currentBudgetIds.has(expense.category)) return expense;
+            if (expense.category === "transport") return { ...expense, category: "parking" };
+            if (expense.category === "activity") return { ...expense, category: "gondola" };
+            return null;
+          })
+          .filter(Boolean)
+      : [];
+
     return {
+      version: STATE_VERSION,
       days: saved.days,
-      budgets: Array.isArray(saved.budgets) ? saved.budgets : fallback.budgets,
-      expenses: Array.isArray(saved.expenses) ? saved.expenses : fallback.expenses,
+      fixedCosts: saved.version === STATE_VERSION && Array.isArray(saved.fixedCosts)
+        ? saved.fixedCosts
+        : fallback.fixedCosts,
+      budgets: saved.version === STATE_VERSION && Array.isArray(saved.budgets)
+        ? saved.budgets
+        : fallback.budgets,
+      expenses: migratedExpenses,
       completed: Array.isArray(saved.completed) ? saved.completed : []
     };
   } catch {
@@ -2739,9 +2889,30 @@ function getCountdown(target) {
 }
 
 function getBudgetStats() {
-  const total = state.budgets.reduce((sum, budget) => sum + Number(budget.limit || 0), 0);
-  const spent = state.expenses.reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
-  return { total, spent, remaining: total - spent, percent: total ? (spent / total) * 100 : 0 };
+  const fixedSpent = state.fixedCosts.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+  const tripBudget = state.budgets.reduce((sum, budget) => sum + Number(budget.limit || 0), 0);
+  const tripSpent = state.expenses.reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+  const tripRemaining = tripBudget - tripSpent;
+  return {
+    fixedSpent,
+    tripBudget,
+    tripSpent,
+    tripRemaining,
+    totalPlanned: fixedSpent + tripBudget,
+    percent: tripBudget ? (tripSpent / tripBudget) * 100 : 0
+  };
+}
+
+function getBudgetCategoryStats(budget) {
+  const spent = state.expenses
+    .filter(expense => expense.category === budget.id)
+    .reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+  const remaining = Number(budget.limit || 0) - spent;
+  return {
+    spent,
+    remaining,
+    percent: budget.limit ? (spent / budget.limit) * 100 : 0
+  };
 }
 
 function appleMapsPlace(query) {
@@ -2861,9 +3032,9 @@ function renderHome() {
         </div>
       </div>
       <div class="budget-number">
-        <span>目前已记录</span>
-        <strong>${formatMoney(stats.spent)}</strong>
-        <small>总预算 ${formatMoney(stats.total)}</small>
+        <span>旅途中还可使用</span>
+        <strong>${formatMoney(stats.tripRemaining)}</strong>
+        <small>旅途预算 ${formatMoney(stats.tripBudget)} · 已花 ${formatMoney(stats.tripSpent)}</small>
       </div>
     </div>
     <button class="primary-button" type="button" data-go="wallet">打开旅行钱包</button>
@@ -2981,25 +3152,40 @@ function renderWallet() {
   const stats = getBudgetStats();
   const budgetRows = state.budgets
     .map(budget => {
-      const spent = state.expenses
-        .filter(expense => expense.category === budget.id)
-        .reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
-      const percent = budget.limit ? (spent / budget.limit) * 100 : 0;
+      const categoryStats = getBudgetCategoryStats(budget);
       return `
         <div class="budget-category">
           <div class="budget-category-header">
             <strong>${escapeHtml(budget.name)}</strong>
             <button class="text-button edit-budget" type="button" data-budget-id="${budget.id}" title="修改预算">
-              ${formatMoney(spent)} / ${formatMoney(budget.limit)}
+              预算 ${formatMoney(budget.limit)}
             </button>
           </div>
-          <div class="budget-track">
-            <div class="budget-fill" style="width:${Math.min(percent, 100)}%;--category-color:${budget.color}"></div>
+          <div class="budget-category-numbers">
+            <span>已花 <strong>${formatMoney(categoryStats.spent)}</strong></span>
+            <span class="${categoryStats.remaining < 0 ? "is-over" : ""}">
+              剩余 <strong>${formatMoney(categoryStats.remaining)}</strong>
+            </span>
           </div>
-          ${percent > 100 ? `<p class="budget-over">已超出 ${formatMoney(spent - budget.limit)}</p>` : ""}
+          <div class="budget-track">
+            <div class="budget-fill" style="width:${Math.min(Math.max(categoryStats.percent, 0), 100)}%;--category-color:${budget.color}"></div>
+          </div>
+          <button class="category-expense-button" type="button" data-add-expense-category="${budget.id}">
+            + 记入实际花费
+          </button>
+          ${categoryStats.remaining < 0 ? `<p class="budget-over">已超出 ${formatMoney(Math.abs(categoryStats.remaining))}</p>` : ""}
         </div>
       `;
     })
+    .join("");
+
+  const fixedCostRows = state.fixedCosts
+    .map(item => `
+      <div class="fixed-cost-row">
+        <span>${escapeHtml(item.name)}</span>
+        <strong>${formatMoney(item.amount)}</strong>
+      </div>
+    `)
     .join("");
 
   const expenseRows = [...state.expenses]
@@ -3023,19 +3209,24 @@ function renderWallet() {
   $("#wallet-content").innerHTML = `
     <div class="wallet-summary">
       <article class="wallet-stat">
+        <span>FIXED PAID</span>
+        <strong>${formatMoney(stats.fixedSpent)}</strong>
+        <small>已支付，不含摄影师费用</small>
+      </article>
+      <article class="wallet-stat">
         <span>TRIP BUDGET</span>
-        <strong>${formatMoney(stats.total)}</strong>
-        <small>预算可点击分类金额修改</small>
+        <strong>${formatMoney(stats.tripBudget)}</strong>
+        <small>旅途中可控制预算</small>
       </article>
       <article class="wallet-stat">
-        <span>SPENT SO FAR</span>
-        <strong>${formatMoney(stats.spent)}</strong>
-        <small>占总预算 ${Math.round(stats.percent)}%</small>
+        <span>TRIP SPENT</span>
+        <strong>${formatMoney(stats.tripSpent)}</strong>
+        <small>占旅途预算 ${Math.round(stats.percent)}%</small>
       </article>
       <article class="wallet-stat">
-        <span>STILL AVAILABLE</span>
-        <strong>${formatMoney(stats.remaining)}</strong>
-        <small>${stats.remaining >= 0 ? "仍在预算范围内" : "已经超过计划预算"}</small>
+        <span>TRIP REMAINING</span>
+        <strong>${formatMoney(stats.tripRemaining)}</strong>
+        <small>${stats.tripRemaining >= 0 ? "仍可使用的旅途预算" : "已经超过旅途预算"}</small>
       </article>
     </div>
     <div class="wallet-grid">
@@ -3055,9 +3246,20 @@ function renderWallet() {
             <h2>花费记录</h2>
           </div>
         </div>
-        <div class="expense-list">${expenseRows || '<div class="empty-state">还没有花费记录</div>'}</div>
+        <div class="expense-list">${expenseRows || '<div class="empty-state">还没有实际花费；从预算分类逐项记录。</div>'}</div>
       </section>
     </div>
+    <details class="panel fixed-cost-panel">
+      <summary>
+        <span>
+          <small>PAID BEFORE TRIP</small>
+          <strong>已支付固定费用明细</strong>
+        </span>
+        <strong>${formatMoney(stats.fixedSpent)}</strong>
+      </summary>
+      <div class="fixed-cost-list">${fixedCostRows}</div>
+      <p>摄影师 RM8,460 不计入这里，也不从旅途预算扣减。</p>
+    </details>
   `;
 }
 
@@ -3297,10 +3499,27 @@ function deletePlan(itemId) {
   showToast("行程已删除");
 }
 
-function openExpenseModal() {
+function updateExpenseBudgetHint() {
+  const form = $("#expense-form");
+  const budget = state.budgets.find(entry => entry.id === form.elements.category.value);
+  const hint = $("#expense-budget-hint");
+  if (!budget || !hint) return;
+
+  const categoryStats = getBudgetCategoryStats(budget);
+  const enteredAmount = Number(form.elements.amount.value || 0);
+  const projectedRemaining = categoryStats.remaining - enteredAmount;
+  hint.textContent = `预算 ${formatMoney(budget.limit)} · 已花 ${formatMoney(categoryStats.spent)} · 这笔后剩余 ${formatMoney(projectedRemaining)}`;
+  hint.classList.toggle("is-over", projectedRemaining < 0);
+}
+
+function openExpenseModal(categoryId = "") {
   const form = $("#expense-form");
   form.reset();
   form.elements.date.value = getLocalDateValue();
+  if (categoryId && state.budgets.some(budget => budget.id === categoryId)) {
+    form.elements.category.value = categoryId;
+  }
+  updateExpenseBudgetHint();
   $("#expense-modal").showModal();
   setTimeout(() => form.elements.amount.focus(), 50);
 }
@@ -3469,6 +3688,12 @@ function handleClick(event) {
     return;
   }
 
+  const categoryExpense = event.target.closest("[data-add-expense-category]");
+  if (categoryExpense) {
+    openExpenseModal(categoryExpense.dataset.addExpenseCategory);
+    return;
+  }
+
   const deleteExpense = event.target.closest(".delete-expense");
   if (deleteExpense) {
     state.expenses = state.expenses.filter(expense => expense.id !== deleteExpense.dataset.expenseId);
@@ -3530,6 +3755,9 @@ function setupForms() {
     saveExpenseForm();
     $("#expense-modal").close();
   });
+
+  $("#expense-category").addEventListener("change", updateExpenseBudgetHint);
+  $("#expense-form").elements.amount.addEventListener("input", updateExpenseBudgetHint);
 
   $$(".modal").forEach(modal => {
     modal.addEventListener("click", event => {
