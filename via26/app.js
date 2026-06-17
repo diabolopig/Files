@@ -1057,6 +1057,8 @@ function setupForms() {
 
 function setupInstall() {
   const installButton = $("#install-button");
+  if (!installButton) return;
+
   window.addEventListener("beforeinstallprompt", event => {
     event.preventDefault();
     deferredInstallPrompt = event;
