@@ -1,4 +1,4 @@
-const CACHE_NAME = "via-26-v5-ios27";
+const CACHE_NAME = "via-26-v6-clean-topbar";
 const APP_SHELL = [
   "./",
   "./index.html",
