@@ -157,13 +157,6 @@ summary:focus-visible {
   font-family: "Iowan Old Style", "Noto Serif SC", Georgia, serif;
 }
 
-.sync-state {
-  padding: 7px 10px;
-  border: 1px solid rgba(255, 255, 255, 0.58);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.3);
-}
-
 .icon-button,
 .close-button {
   border-color: rgba(255, 255, 255, 0.68);
