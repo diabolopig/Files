@@ -1,4 +1,4 @@
-const CACHE_NAME = "trip-assistant-v8-wallet-records";
+const CACHE_NAME = "trip-assistant-v9-liquid-glass";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -8,6 +8,9 @@ const APP_SHELL = [
   "./data.js",
   "./manifest.webmanifest",
   "./icon.svg",
+  "./apple-touch-icon.png",
+  "./icon-192.png",
+  "./icon-512.png",
   "./assets/dubai-city-desert.jpg",
   "./assets/dolomites-meadow.jpg",
   "./assets/venice-gondola.jpg"
