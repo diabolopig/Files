@@ -5,14 +5,17 @@
       <stop offset=".55" stop-color="#356D68"/>
       <stop offset="1" stop-color="#B8623D"/>
     </linearGradient>
-    <linearGradient id="glass" x1="142" y1="102" x2="372" y2="402" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FFF" stop-opacity=".93"/>
-      <stop offset="1" stop-color="#F7EEE3" stop-opacity=".68"/>
+    <linearGradient id="glass" x1="102" y1="98" x2="414" y2="408" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF" stop-opacity=".78"/>
+      <stop offset="1" stop-color="#FFF" stop-opacity=".22"/>
     </linearGradient>
   </defs>
   <rect width="512" height="512" rx="116" fill="url(#bg)"/>
   <path d="M35 134C126 65 200 73 287 35c76-33 143-5 190 35v177c-95 62-190 25-269 65-68 34-126 84-173 132V134Z" fill="#fff" opacity=".08"/>
   <rect x="65" y="65" width="382" height="382" rx="96" fill="#fff" opacity=".08" stroke="#fff" stroke-opacity=".3" stroke-width="3"/>
-  <path d="M119 120h76l62 210 61-210h76L294 397h-76L119 120Z" fill="url(#glass)"/>
-  <circle cx="377" cy="374" r="31" fill="#F5B082" stroke="#fff" stroke-opacity=".65" stroke-width="4"/>
+  <path d="M102 326c70-120 137-173 204-118 42 35 69 43 104-19" fill="none" stroke="url(#glass)" stroke-linecap="round" stroke-width="28"/>
+  <path d="M102 326c70-120 137-173 204-118 42 35 69 43 104-19" fill="none" stroke="#F6D8C1" stroke-dasharray="4 34" stroke-linecap="round" stroke-width="10"/>
+  <circle cx="105" cy="326" r="30" fill="#F5B082" stroke="#fff" stroke-opacity=".7" stroke-width="6"/>
+  <circle cx="259" cy="202" r="30" fill="#EBD7C4" stroke="#fff" stroke-opacity=".7" stroke-width="6"/>
+  <circle cx="410" cy="189" r="30" fill="#F5B082" stroke="#fff" stroke-opacity=".7" stroke-width="6"/>
 </svg>

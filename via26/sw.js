@@ -1,4 +1,4 @@
-const CACHE_NAME = "via-26-v6-clean-topbar";
+const CACHE_NAME = "trip-assistant-v7-no-via-brand";
 const APP_SHELL = [
   "./",
   "./index.html",

@@ -1075,7 +1075,7 @@ function setupInstall() {
 
   window.addEventListener("appinstalled", () => {
     installButton.hidden = true;
-    showToast("VIA 26 已安装");
+    showToast("旅行助手已安装");
   });
 }
 

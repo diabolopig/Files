@@ -1,6 +1,6 @@
 {
-  "name": "VIA 26 Travel Companion",
-  "short_name": "VIA 26",
+  "name": "Dubai Dolomites Venice 旅行助手",
+  "short_name": "旅行助手",
   "description": "Dubai, Dolomites 与 Venice 私人旅行助手",
   "start_url": "./",
   "scope": "./",
