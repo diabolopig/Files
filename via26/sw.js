@@ -1,4 +1,4 @@
-const CACHE_NAME = "trip-assistant-v7-no-via-brand";
+const CACHE_NAME = "trip-assistant-v8-wallet-records";
 const APP_SHELL = [
   "./",
   "./index.html",

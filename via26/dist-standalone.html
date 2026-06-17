@@ -1360,6 +1360,53 @@ main {
   gap: 10px;
 }
 
+.expense-sections {
+  display: grid;
+  gap: 22px;
+}
+
+.expense-section {
+  min-width: 0;
+}
+
+.expense-section + .expense-section {
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.expense-section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 14px;
+}
+
+.expense-section-heading span,
+.expense-section-heading strong {
+  display: block;
+}
+
+.expense-section-heading span {
+  margin-bottom: 5px;
+  color: var(--muted);
+  letter-spacing: 0.12em;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.expense-section-heading strong {
+  font-size: 13px;
+}
+
+.expense-section-heading em {
+  color: var(--terracotta);
+  font-family: Georgia, serif;
+  font-size: 18px;
+  font-style: normal;
+  white-space: nowrap;
+}
+
 .expense-row {
   display: grid;
   padding: 13px 0;
@@ -1423,6 +1470,15 @@ main {
   font-size: 12px;
 }
 
+.empty-state.is-compact {
+  padding: 18px;
+  border: 1px solid rgba(69, 60, 50, 0.07);
+  border-radius: 16px;
+  background: rgba(248, 244, 238, 0.58);
+  text-align: left;
+  line-height: 1.65;
+}
+
 .fixed-cost-panel {
   margin-top: 26px;
   padding: clamp(22px, 4vw, 30px);
@@ -1464,6 +1520,11 @@ main {
   border-top: 1px solid var(--line);
 }
 
+.fixed-record-section .fixed-cost-list {
+  margin-top: 0;
+  border-top: 0;
+}
+
 .fixed-cost-row {
   display: flex;
   padding: 11px 0;
@@ -1471,6 +1532,22 @@ main {
   justify-content: space-between;
   gap: 16px;
   font-size: 11px;
+}
+
+.fixed-cost-row span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.fixed-cost-row strong {
+  white-space: nowrap;
+}
+
+.expense-panel-note {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.6;
 }
 
 .fixed-cost-panel > p {
@@ -2172,6 +2249,15 @@ main {
 
   .expense-row {
     grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .expense-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .expense-section-heading em {
+    white-space: normal;
   }
 
   .budget-category-numbers,
@@ -2889,6 +2975,22 @@ main {
 .expense-row {
   margin: 0 -4px;
   padding: 13px 4px;
+}
+
+.expense-section {
+  padding: 16px;
+  border: 1px solid rgba(69, 60, 50, 0.07);
+  border-radius: 20px;
+  background: rgba(248, 244, 238, 0.55);
+}
+
+.expense-section + .expense-section {
+  padding-top: 16px;
+  border-top: 1px solid rgba(69, 60, 50, 0.07);
+}
+
+.expense-section-heading em {
+  color: #a65436;
 }
 
 .delete-expense {
@@ -4415,24 +4517,37 @@ function renderWallet() {
       <section class="panel expense-panel">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">RECENT</p>
+            <p class="eyebrow">RECORDS</p>
             <h2>花费记录</h2>
           </div>
         </div>
-        <div class="expense-list">${expenseRows || '<div class="empty-state">还没有实际花费；从预算分类逐项记录。</div>'}</div>
+        <div class="expense-sections">
+          <section class="expense-section">
+            <div class="expense-section-heading">
+              <div>
+                <span>TRIP ACTUALS</span>
+                <strong>旅途中实际花费</strong>
+              </div>
+              <em>${formatMoney(stats.tripSpent)}</em>
+            </div>
+            <div class="expense-list">
+              ${expenseRows || '<div class="empty-state is-compact">还没有新增实际花费；点击预算分类里的「记入实际花费」后，这里会逐笔列出并扣减旅途预算。</div>'}
+            </div>
+          </section>
+          <section class="expense-section fixed-record-section">
+            <div class="expense-section-heading">
+              <div>
+                <span>PAID BEFORE TRIP</span>
+                <strong>已支付明细</strong>
+              </div>
+              <em>${formatMoney(stats.fixedSpent)}</em>
+            </div>
+            <div class="fixed-cost-list">${fixedCostRows}</div>
+            <p class="expense-panel-note">这些是出发前已支付/已确认项目，不会扣减旅途中预算；摄影师 RM8,460 另列，不计入这里。</p>
+          </section>
+        </div>
       </section>
     </div>
-    <details class="panel fixed-cost-panel">
-      <summary>
-        <span>
-          <small>PAID BEFORE TRIP</small>
-          <strong>已支付固定费用明细</strong>
-        </span>
-        <strong>${formatMoney(stats.fixedSpent)}</strong>
-      </summary>
-      <div class="fixed-cost-list">${fixedCostRows}</div>
-      <p>摄影师 RM8,460 不计入这里，也不从旅途预算扣减。</p>
-    </details>
   `;
 }
 

@@ -531,24 +531,37 @@ function renderWallet() {
       <section class="panel expense-panel">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">RECENT</p>
+            <p class="eyebrow">RECORDS</p>
             <h2>花费记录</h2>
           </div>
         </div>
-        <div class="expense-list">${expenseRows || '<div class="empty-state">还没有实际花费；从预算分类逐项记录。</div>'}</div>
+        <div class="expense-sections">
+          <section class="expense-section">
+            <div class="expense-section-heading">
+              <div>
+                <span>TRIP ACTUALS</span>
+                <strong>旅途中实际花费</strong>
+              </div>
+              <em>${formatMoney(stats.tripSpent)}</em>
+            </div>
+            <div class="expense-list">
+              ${expenseRows || '<div class="empty-state is-compact">还没有新增实际花费；点击预算分类里的「记入实际花费」后，这里会逐笔列出并扣减旅途预算。</div>'}
+            </div>
+          </section>
+          <section class="expense-section fixed-record-section">
+            <div class="expense-section-heading">
+              <div>
+                <span>PAID BEFORE TRIP</span>
+                <strong>已支付明细</strong>
+              </div>
+              <em>${formatMoney(stats.fixedSpent)}</em>
+            </div>
+            <div class="fixed-cost-list">${fixedCostRows}</div>
+            <p class="expense-panel-note">这些是出发前已支付/已确认项目，不会扣减旅途中预算；摄影师 RM8,460 另列，不计入这里。</p>
+          </section>
+        </div>
       </section>
     </div>
-    <details class="panel fixed-cost-panel">
-      <summary>
-        <span>
-          <small>PAID BEFORE TRIP</small>
-          <strong>已支付固定费用明细</strong>
-        </span>
-        <strong>${formatMoney(stats.fixedSpent)}</strong>
-      </summary>
-      <div class="fixed-cost-list">${fixedCostRows}</div>
-      <p>摄影师 RM8,460 不计入这里，也不从旅途预算扣减。</p>
-    </details>
   `;
 }
 
