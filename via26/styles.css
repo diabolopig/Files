@@ -124,28 +124,6 @@ svg {
   font-style: italic;
 }
 
-.topbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.sync-state {
-  display: inline-flex;
-  align-items: center;
-  color: var(--muted);
-  font-size: 12px;
-  gap: 7px;
-}
-
-.sync-state i {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #6f9a73;
-  box-shadow: 0 0 0 4px rgba(111, 154, 115, 0.12);
-}
-
 .icon-button,
 .close-button {
   display: grid;
@@ -1923,10 +1901,6 @@ main {
   .topbar {
     min-height: 70px;
     padding: 10px 18px;
-  }
-
-  .sync-state {
-    display: none;
   }
 
   main {
