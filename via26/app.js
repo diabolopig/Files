@@ -439,17 +439,57 @@ function findItem(itemId) {
 
 function renderWallet() {
   const stats = getBudgetStats();
+  const today = getLocalDateValue();
+  const todaySpent = state.expenses
+    .filter(expense => expense.date === today)
+    .reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+  const healthLabel = stats.tripSpent === 0
+    ? "Ready"
+    : stats.percent <= 70
+      ? "Good"
+      : stats.percent <= 100
+        ? "Watch"
+        : "Over";
+  const healthText = stats.tripSpent === 0
+    ? "还未开始花旅途预算"
+    : stats.percent <= 70
+      ? "预算状态良好"
+      : stats.percent <= 100
+        ? "接近预算上限"
+        : "已经超出预算";
   const budgetRows = state.budgets
     .map(budget => {
       const categoryStats = getBudgetCategoryStats(budget);
       return `
-        <div class="budget-category">
+        <div class="budget-category" style="--category-color:${budget.color}">
           <div class="budget-category-header">
-            <strong>${escapeHtml(budget.name)}</strong>
-            <button class="text-button edit-budget" type="button" data-budget-id="${budget.id}" title="修改预算">
+            <div class="budget-category-title">
+              <span class="budget-category-dot"></span>
+              <div>
+                <strong>${escapeHtml(budget.name)}</strong>
+                <small>${escapeHtml(budget.shortName)}</small>
+              </div>
+            </div>
+            <button class="budget-limit-button edit-budget" type="button" data-budget-id="${budget.id}" title="修改预算">
               预算 ${formatMoney(budget.limit)}
             </button>
           </div>
+          <form class="quick-expense-form" data-quick-expense-category="${budget.id}">
+            <label class="quick-amount-field">
+              <span>RM</span>
+              <input
+                name="amount"
+                inputmode="decimal"
+                type="number"
+                min="0.01"
+                step="0.01"
+                placeholder="0"
+                aria-label="输入${escapeHtml(budget.name)}实际花费金额"
+                required
+              />
+            </label>
+            <button class="quick-expense-save" type="submit">加入</button>
+          </form>
           <div class="budget-category-numbers">
             <span>已花 <strong>${formatMoney(categoryStats.spent)}</strong></span>
             <span class="${categoryStats.remaining < 0 ? "is-over" : ""}">
@@ -459,9 +499,12 @@ function renderWallet() {
           <div class="budget-track">
             <div class="budget-fill" style="width:${Math.min(Math.max(categoryStats.percent, 0), 100)}%;--category-color:${budget.color}"></div>
           </div>
-          <button class="category-expense-button" type="button" data-add-expense-category="${budget.id}">
-            + 记入实际花费
-          </button>
+          <div class="budget-category-footer">
+            <span>点金额框直接输入，保存后会扣剩余预算</span>
+            <button class="category-expense-button" type="button" data-add-expense-category="${budget.id}">
+              完整备注
+            </button>
+          </div>
           ${categoryStats.remaining < 0 ? `<p class="budget-over">已超出 ${formatMoney(Math.abs(categoryStats.remaining))}</p>` : ""}
         </div>
       `;
@@ -496,28 +539,34 @@ function renderWallet() {
     .join("");
 
   $("#wallet-content").innerHTML = `
-    <div class="wallet-summary">
-      <article class="wallet-stat">
-        <span>FIXED PAID</span>
-        <strong>${formatMoney(stats.fixedSpent)}</strong>
-        <small>已支付，不含摄影师费用</small>
-      </article>
-      <article class="wallet-stat">
-        <span>TRIP BUDGET</span>
-        <strong>${formatMoney(stats.tripBudget)}</strong>
-        <small>旅途中可控制预算</small>
-      </article>
-      <article class="wallet-stat">
-        <span>TRIP SPENT</span>
-        <strong>${formatMoney(stats.tripSpent)}</strong>
-        <small>占旅途预算 ${Math.round(stats.percent)}%</small>
-      </article>
-      <article class="wallet-stat">
-        <span>TRIP REMAINING</span>
-        <strong>${formatMoney(stats.tripRemaining)}</strong>
-        <small>${stats.tripRemaining >= 0 ? "仍可使用的旅途预算" : "已经超过旅途预算"}</small>
-      </article>
-    </div>
+    <section class="wallet-overview-card panel">
+      <div class="wallet-overview-copy">
+        <p class="eyebrow">TRIP BUDGET</p>
+        <span>Left in this trip budget</span>
+        <strong class="${stats.tripRemaining < 0 ? "is-over" : ""}">${formatMoney(stats.tripRemaining)}</strong>
+        <small>Out of ${formatMoney(stats.tripBudget)} budgeted · spent ${formatMoney(stats.tripSpent)}</small>
+      </div>
+      <div class="wallet-overview-metrics">
+        <article>
+          <span>Today</span>
+          <strong>${formatMoney(todaySpent)}</strong>
+          <small>今日记录</small>
+        </article>
+        <article>
+          <span>Paid</span>
+          <strong>${formatMoney(stats.fixedSpent)}</strong>
+          <small>已支付固定费用</small>
+        </article>
+        <article>
+          <span>${healthLabel}</span>
+          <strong>${Math.round(stats.percent)}%</strong>
+          <small>${healthText}</small>
+          <div class="wallet-health-meter">
+            <i style="width:${Math.min(Math.max(stats.percent, 0), 100)}%"></i>
+          </div>
+        </article>
+      </div>
+    </section>
     <div class="wallet-grid">
       <section class="panel budget-panel">
         <div class="section-heading">
@@ -545,7 +594,7 @@ function renderWallet() {
               <em>${formatMoney(stats.tripSpent)}</em>
             </div>
             <div class="expense-list">
-              ${expenseRows || '<div class="empty-state is-compact">还没有新增实际花费；点击预算分类里的「记入实际花费」后，这里会逐笔列出并扣减旅途预算。</div>'}
+              ${expenseRows || '<div class="empty-state is-compact">还没有新增实际花费；点击预算分类里的 RM 金额框即可直接记录。</div>'}
             </div>
           </section>
           <section class="expense-section fixed-record-section">
@@ -841,6 +890,35 @@ function saveExpenseForm() {
   showToast("花费已记录");
 }
 
+function saveQuickExpenseForm(form) {
+  const categoryId = form.dataset.quickExpenseCategory;
+  const budget = state.budgets.find(entry => entry.id === categoryId);
+  const amount = Number(form.elements.amount.value);
+
+  if (!budget) {
+    showToast("找不到预算分类");
+    return;
+  }
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    showToast("请输入有效金额");
+    form.elements.amount.focus();
+    return;
+  }
+
+  state.expenses.push({
+    id: `expense-${crypto.randomUUID()}`,
+    date: getLocalDateValue(),
+    category: budget.id,
+    amount,
+    note: `${budget.shortName} 实际花费`
+  });
+  saveState();
+  renderHome();
+  renderWallet();
+  showToast(`已记入 ${formatMoney(amount)}`);
+}
+
 function startDrag(event, handle) {
   if (event.button !== undefined && ![0, 1].includes(event.button)) return;
   const itemElement = handle.closest(".timeline-item");
@@ -1060,6 +1138,12 @@ function setupForms() {
 
   $("#expense-category").addEventListener("change", updateExpenseBudgetHint);
   $("#expense-form").elements.amount.addEventListener("input", updateExpenseBudgetHint);
+  $("#wallet-content").addEventListener("submit", event => {
+    const quickExpenseForm = event.target.closest(".quick-expense-form");
+    if (!quickExpenseForm) return;
+    event.preventDefault();
+    saveQuickExpenseForm(quickExpenseForm);
+  });
 
   $$(".modal").forEach(modal => {
     modal.addEventListener("click", event => {

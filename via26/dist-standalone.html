@@ -1219,6 +1219,107 @@ main {
   gap: 18px;
 }
 
+.wallet-overview-card {
+  display: grid;
+  margin-bottom: 26px;
+  padding: clamp(26px, 5vw, 42px);
+  grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.95fr);
+  gap: 24px;
+}
+
+.wallet-overview-copy {
+  min-width: 0;
+  text-align: center;
+  align-self: center;
+}
+
+.wallet-overview-copy > span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.wallet-overview-copy strong {
+  display: block;
+  color: var(--ink);
+  font-family: Georgia, serif;
+  font-size: clamp(45px, 8vw, 74px);
+  font-weight: 700;
+  letter-spacing: -0.055em;
+  line-height: 0.95;
+}
+
+.wallet-overview-copy strong.is-over {
+  color: #b34f32;
+}
+
+.wallet-overview-copy small {
+  display: block;
+  margin-top: 13px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.wallet-overview-metrics {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.wallet-overview-metrics article {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.wallet-overview-metrics article:last-child {
+  grid-column: 1 / -1;
+}
+
+.wallet-overview-metrics span,
+.wallet-overview-metrics small {
+  display: block;
+}
+
+.wallet-overview-metrics span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.wallet-overview-metrics strong {
+  display: block;
+  margin: 7px 0 4px;
+  color: var(--ink);
+  font-family: Georgia, serif;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.wallet-overview-metrics small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.wallet-health-meter {
+  overflow: hidden;
+  height: 8px;
+  margin-top: 10px;
+  border-radius: 999px;
+  background: rgba(23, 63, 58, 0.07);
+}
+
+.wallet-health-meter i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #5f9f78, #e0b34e, #d45f45);
+}
+
 .wallet-stat {
   min-height: 170px;
   padding: 27px;
@@ -1294,13 +1395,102 @@ main {
   gap: 12px;
 }
 
-.budget-category-header strong {
+.budget-category-title {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+}
+
+.budget-category-dot {
+  width: 11px;
+  height: 11px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--category-color);
+}
+
+.budget-category-title strong,
+.budget-category-title small {
+  display: block;
+}
+
+.budget-category-title strong {
   font-size: 12px;
 }
 
-.budget-category-header span {
+.budget-category-title small {
+  margin-top: 2px;
   color: var(--muted);
   font-size: 11px;
+}
+
+.budget-limit-button {
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  color: var(--terracotta);
+  background: transparent;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.quick-expense-form {
+  display: grid;
+  margin: 12px 0 11px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 9px;
+}
+
+.quick-amount-field {
+  display: flex;
+  min-width: 0;
+  min-height: 52px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.62);
+  align-items: center;
+  gap: 9px;
+}
+
+.quick-amount-field span {
+  color: var(--muted);
+  font-family: Georgia, serif;
+  font-size: 15px;
+}
+
+.quick-amount-field input {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  color: var(--ink);
+  background: transparent;
+  font-family: Georgia, serif;
+  font-size: 25px;
+  line-height: 1;
+  outline: 0;
+  box-shadow: none;
+}
+
+.quick-amount-field input:focus {
+  border: 0;
+  box-shadow: none;
+}
+
+.quick-expense-save {
+  min-width: 58px;
+  min-height: 52px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 16px;
+  color: var(--paper);
+  background: var(--ink);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 800;
 }
 
 .budget-category-numbers {
@@ -1342,7 +1532,6 @@ main {
 }
 
 .category-expense-button {
-  margin-top: 10px;
   padding: 0;
   border: 0;
   color: var(--green);
@@ -1354,6 +1543,21 @@ main {
 
 .category-expense-button:hover {
   color: var(--terracotta);
+}
+
+.budget-category-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  gap: 12px;
+}
+
+.budget-category-footer span {
+  min-width: 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
 }
 
 .expense-list {
@@ -1981,6 +2185,10 @@ main {
     grid-template-columns: 1fr;
   }
 
+  .wallet-overview-card {
+    grid-template-columns: 1fr;
+  }
+
   .wallet-summary {
     grid-template-columns: 1fr 1fr;
   }
@@ -2132,7 +2340,8 @@ main {
     flex-direction: column;
   }
 
-  .budget-category-header .text-button {
+  .budget-category-header .text-button,
+  .budget-category-header .budget-limit-button {
     max-width: 100%;
     white-space: normal;
     text-align: left;
@@ -2233,6 +2442,18 @@ main {
 
   .wallet-summary {
     grid-template-columns: 1fr;
+  }
+
+  .wallet-overview-card {
+    padding: 26px 20px;
+  }
+
+  .wallet-overview-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .wallet-overview-metrics article:last-child {
+    grid-column: auto;
   }
 
   .wallet-stat {
@@ -2702,6 +2923,9 @@ main {
 .mini-button,
 .drag-handle,
 .category-expense-button,
+.budget-limit-button,
+.quick-expense-save,
+.quick-amount-field,
 .nav-item {
   transition:
     transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
@@ -2717,6 +2941,9 @@ main {
 .close-button:active,
 .mini-button:active,
 .category-expense-button:active,
+.budget-limit-button:active,
+.quick-expense-save:active,
+.quick-amount-field:active,
 .nav-item:active {
   transform: scale(0.96);
 }
@@ -2947,6 +3174,104 @@ main {
   gap: 14px;
 }
 
+.wallet-overview-card {
+  overflow: hidden;
+  border-color: rgba(255, 255, 255, 0.78);
+  border-radius: 34px;
+  background:
+    radial-gradient(circle at 50% -18%, rgba(209, 233, 209, 0.78), transparent 42%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.88), rgba(249, 246, 240, 0.68)),
+    rgba(255, 255, 255, 0.58);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.98) inset,
+    0 24px 70px rgba(55, 47, 38, 0.12);
+  backdrop-filter: blur(34px) saturate(165%);
+  -webkit-backdrop-filter: blur(34px) saturate(165%);
+}
+
+.wallet-overview-card::after {
+  position: absolute;
+  right: -120px;
+  bottom: -150px;
+  width: 280px;
+  height: 280px;
+  border: 1px solid rgba(49, 93, 86, 0.08);
+  border-radius: 50%;
+  box-shadow: 0 0 0 42px rgba(49, 93, 86, 0.035);
+  content: "";
+  pointer-events: none;
+}
+
+.wallet-overview-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.wallet-overview-copy .eyebrow {
+  margin-bottom: 22px;
+}
+
+.wallet-overview-copy > span {
+  color: rgba(84, 80, 74, 0.62);
+  font-family: "SF Pro Text", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 12px;
+}
+
+.wallet-overview-copy strong {
+  font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(52px, 10vw, 82px);
+  font-weight: 760;
+  letter-spacing: -0.07em;
+}
+
+.wallet-overview-copy small {
+  color: rgba(84, 80, 74, 0.66);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.wallet-overview-metrics {
+  position: relative;
+  z-index: 1;
+}
+
+.wallet-overview-metrics article {
+  border-color: rgba(69, 60, 50, 0.06);
+  border-radius: 22px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(255, 251, 245, 0.42)),
+    rgba(255, 255, 255, 0.42);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.84) inset,
+    0 8px 22px rgba(55, 47, 38, 0.055);
+  backdrop-filter: blur(18px) saturate(142%);
+  -webkit-backdrop-filter: blur(18px) saturate(142%);
+}
+
+.wallet-overview-metrics span {
+  color: rgba(84, 80, 74, 0.56);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.wallet-overview-metrics strong {
+  font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 25px;
+  font-weight: 750;
+  letter-spacing: -0.05em;
+}
+
+.wallet-health-meter {
+  height: 9px;
+  background: rgba(45, 40, 34, 0.07);
+  box-shadow: 0 1px 3px rgba(55, 47, 38, 0.045) inset;
+}
+
+.wallet-health-meter i {
+  background: linear-gradient(90deg, #5fa47a 0%, #a9cf69 48%, #ecc653 78%, #d45f45 100%);
+  box-shadow: 0 0 16px rgba(100, 166, 118, 0.24);
+}
+
 .wallet-stat {
   position: relative;
   overflow: hidden;
@@ -3005,6 +3330,116 @@ main {
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset;
   backdrop-filter: blur(18px) saturate(140%);
   -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+
+.budget-category-header {
+  margin-bottom: 12px;
+}
+
+.budget-category-dot {
+  width: 12px;
+  height: 12px;
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--category-color) 14%, transparent),
+    0 0 16px color-mix(in srgb, var(--category-color) 28%, transparent);
+}
+
+.budget-category-title strong {
+  font-size: 13px;
+  letter-spacing: -0.01em;
+}
+
+.budget-category-title small {
+  color: rgba(84, 80, 74, 0.68);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.budget-limit-button {
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid rgba(166, 86, 50, 0.1);
+  border-radius: 999px;
+  color: #a65436;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.64), rgba(255, 251, 245, 0.36)),
+    rgba(255, 255, 255, 0.24);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.74) inset;
+}
+
+.quick-expense-form {
+  margin: 12px 0;
+}
+
+.quick-amount-field {
+  position: relative;
+  overflow: hidden;
+  min-height: 58px;
+  border-color: rgba(255, 255, 255, 0.64);
+  border-radius: 19px;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.82), transparent 42%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.68), rgba(255, 251, 245, 0.34)),
+    rgba(248, 244, 238, 0.32);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 7px 19px rgba(55, 47, 38, 0.055);
+  backdrop-filter: blur(18px) saturate(145%);
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
+}
+
+.quick-amount-field:focus-within {
+  border-color: color-mix(in srgb, var(--category-color) 42%, rgba(255, 255, 255, 0.8));
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 0 0 4px color-mix(in srgb, var(--category-color) 13%, transparent),
+    0 10px 26px rgba(55, 47, 38, 0.08);
+  transform: translateY(-1px);
+}
+
+.quick-amount-field span {
+  color: rgba(84, 80, 74, 0.58);
+  font-family: "SF Pro Text", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.quick-amount-field input {
+  font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 28px;
+  font-weight: 650;
+  letter-spacing: -0.035em;
+}
+
+.quick-amount-field input::placeholder {
+  color: rgba(38, 35, 31, 0.28);
+}
+
+.quick-expense-save {
+  min-height: 58px;
+  border: 1px solid rgba(255, 255, 255, 0.36);
+  border-radius: 19px;
+  color: #fffaf4;
+  background:
+    radial-gradient(circle at 24% 0%, rgba(255, 255, 255, 0.2), transparent 40%),
+    linear-gradient(145deg, color-mix(in srgb, var(--category-color) 78%, #173f3a), #173f3a);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.24) inset,
+    0 10px 22px color-mix(in srgb, var(--category-color) 22%, transparent);
+}
+
+.budget-category-footer {
+  margin-top: 11px;
+}
+
+.budget-category-footer span {
+  color: rgba(84, 80, 74, 0.62);
+  font-size: 10px;
+}
+
+.budget-category-footer .category-expense-button {
+  flex: 0 0 auto;
+  margin-top: 0;
 }
 
 .budget-track {
@@ -3537,6 +3972,24 @@ main {
 
   .wallet-summary {
     gap: 12px;
+  }
+
+  .wallet-overview-card {
+    padding: 28px 20px 22px;
+    border-radius: 30px;
+    gap: 20px;
+  }
+
+  .wallet-overview-copy {
+    text-align: left;
+  }
+
+  .wallet-overview-copy strong {
+    font-size: clamp(47px, 14vw, 62px);
+  }
+
+  .wallet-overview-metrics article {
+    border-radius: 20px;
   }
 
   .wallet-stat {
@@ -4598,17 +5051,57 @@ function findItem(itemId) {
 
 function renderWallet() {
   const stats = getBudgetStats();
+  const today = getLocalDateValue();
+  const todaySpent = state.expenses
+    .filter(expense => expense.date === today)
+    .reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+  const healthLabel = stats.tripSpent === 0
+    ? "Ready"
+    : stats.percent <= 70
+      ? "Good"
+      : stats.percent <= 100
+        ? "Watch"
+        : "Over";
+  const healthText = stats.tripSpent === 0
+    ? "还未开始花旅途预算"
+    : stats.percent <= 70
+      ? "预算状态良好"
+      : stats.percent <= 100
+        ? "接近预算上限"
+        : "已经超出预算";
   const budgetRows = state.budgets
     .map(budget => {
       const categoryStats = getBudgetCategoryStats(budget);
       return `
-        <div class="budget-category">
+        <div class="budget-category" style="--category-color:${budget.color}">
           <div class="budget-category-header">
-            <strong>${escapeHtml(budget.name)}</strong>
-            <button class="text-button edit-budget" type="button" data-budget-id="${budget.id}" title="修改预算">
+            <div class="budget-category-title">
+              <span class="budget-category-dot"></span>
+              <div>
+                <strong>${escapeHtml(budget.name)}</strong>
+                <small>${escapeHtml(budget.shortName)}</small>
+              </div>
+            </div>
+            <button class="budget-limit-button edit-budget" type="button" data-budget-id="${budget.id}" title="修改预算">
               预算 ${formatMoney(budget.limit)}
             </button>
           </div>
+          <form class="quick-expense-form" data-quick-expense-category="${budget.id}">
+            <label class="quick-amount-field">
+              <span>RM</span>
+              <input
+                name="amount"
+                inputmode="decimal"
+                type="number"
+                min="0.01"
+                step="0.01"
+                placeholder="0"
+                aria-label="输入${escapeHtml(budget.name)}实际花费金额"
+                required
+              />
+            </label>
+            <button class="quick-expense-save" type="submit">加入</button>
+          </form>
           <div class="budget-category-numbers">
             <span>已花 <strong>${formatMoney(categoryStats.spent)}</strong></span>
             <span class="${categoryStats.remaining < 0 ? "is-over" : ""}">
@@ -4618,9 +5111,12 @@ function renderWallet() {
           <div class="budget-track">
             <div class="budget-fill" style="width:${Math.min(Math.max(categoryStats.percent, 0), 100)}%;--category-color:${budget.color}"></div>
           </div>
-          <button class="category-expense-button" type="button" data-add-expense-category="${budget.id}">
-            + 记入实际花费
-          </button>
+          <div class="budget-category-footer">
+            <span>点金额框直接输入，保存后会扣剩余预算</span>
+            <button class="category-expense-button" type="button" data-add-expense-category="${budget.id}">
+              完整备注
+            </button>
+          </div>
           ${categoryStats.remaining < 0 ? `<p class="budget-over">已超出 ${formatMoney(Math.abs(categoryStats.remaining))}</p>` : ""}
         </div>
       `;
@@ -4655,28 +5151,34 @@ function renderWallet() {
     .join("");
 
   $("#wallet-content").innerHTML = `
-    <div class="wallet-summary">
-      <article class="wallet-stat">
-        <span>FIXED PAID</span>
-        <strong>${formatMoney(stats.fixedSpent)}</strong>
-        <small>已支付，不含摄影师费用</small>
-      </article>
-      <article class="wallet-stat">
-        <span>TRIP BUDGET</span>
-        <strong>${formatMoney(stats.tripBudget)}</strong>
-        <small>旅途中可控制预算</small>
-      </article>
-      <article class="wallet-stat">
-        <span>TRIP SPENT</span>
-        <strong>${formatMoney(stats.tripSpent)}</strong>
-        <small>占旅途预算 ${Math.round(stats.percent)}%</small>
-      </article>
-      <article class="wallet-stat">
-        <span>TRIP REMAINING</span>
-        <strong>${formatMoney(stats.tripRemaining)}</strong>
-        <small>${stats.tripRemaining >= 0 ? "仍可使用的旅途预算" : "已经超过旅途预算"}</small>
-      </article>
-    </div>
+    <section class="wallet-overview-card panel">
+      <div class="wallet-overview-copy">
+        <p class="eyebrow">TRIP BUDGET</p>
+        <span>Left in this trip budget</span>
+        <strong class="${stats.tripRemaining < 0 ? "is-over" : ""}">${formatMoney(stats.tripRemaining)}</strong>
+        <small>Out of ${formatMoney(stats.tripBudget)} budgeted · spent ${formatMoney(stats.tripSpent)}</small>
+      </div>
+      <div class="wallet-overview-metrics">
+        <article>
+          <span>Today</span>
+          <strong>${formatMoney(todaySpent)}</strong>
+          <small>今日记录</small>
+        </article>
+        <article>
+          <span>Paid</span>
+          <strong>${formatMoney(stats.fixedSpent)}</strong>
+          <small>已支付固定费用</small>
+        </article>
+        <article>
+          <span>${healthLabel}</span>
+          <strong>${Math.round(stats.percent)}%</strong>
+          <small>${healthText}</small>
+          <div class="wallet-health-meter">
+            <i style="width:${Math.min(Math.max(stats.percent, 0), 100)}%"></i>
+          </div>
+        </article>
+      </div>
+    </section>
     <div class="wallet-grid">
       <section class="panel budget-panel">
         <div class="section-heading">
@@ -4704,7 +5206,7 @@ function renderWallet() {
               <em>${formatMoney(stats.tripSpent)}</em>
             </div>
             <div class="expense-list">
-              ${expenseRows || '<div class="empty-state is-compact">还没有新增实际花费；点击预算分类里的「记入实际花费」后，这里会逐笔列出并扣减旅途预算。</div>'}
+              ${expenseRows || '<div class="empty-state is-compact">还没有新增实际花费；点击预算分类里的 RM 金额框即可直接记录。</div>'}
             </div>
           </section>
           <section class="expense-section fixed-record-section">
@@ -5000,6 +5502,35 @@ function saveExpenseForm() {
   showToast("花费已记录");
 }
 
+function saveQuickExpenseForm(form) {
+  const categoryId = form.dataset.quickExpenseCategory;
+  const budget = state.budgets.find(entry => entry.id === categoryId);
+  const amount = Number(form.elements.amount.value);
+
+  if (!budget) {
+    showToast("找不到预算分类");
+    return;
+  }
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    showToast("请输入有效金额");
+    form.elements.amount.focus();
+    return;
+  }
+
+  state.expenses.push({
+    id: `expense-${crypto.randomUUID()}`,
+    date: getLocalDateValue(),
+    category: budget.id,
+    amount,
+    note: `${budget.shortName} 实际花费`
+  });
+  saveState();
+  renderHome();
+  renderWallet();
+  showToast(`已记入 ${formatMoney(amount)}`);
+}
+
 function startDrag(event, handle) {
   if (event.button !== undefined && ![0, 1].includes(event.button)) return;
   const itemElement = handle.closest(".timeline-item");
@@ -5219,6 +5750,12 @@ function setupForms() {
 
   $("#expense-category").addEventListener("change", updateExpenseBudgetHint);
   $("#expense-form").elements.amount.addEventListener("input", updateExpenseBudgetHint);
+  $("#wallet-content").addEventListener("submit", event => {
+    const quickExpenseForm = event.target.closest(".quick-expense-form");
+    if (!quickExpenseForm) return;
+    event.preventDefault();
+    saveQuickExpenseForm(quickExpenseForm);
+  });
 
   $$(".modal").forEach(modal => {
     modal.addEventListener("click", event => {
