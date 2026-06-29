@@ -1761,6 +1761,209 @@ main {
   font-size: 10px;
 }
 
+.save-capture {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  margin-bottom: 26px;
+  padding: clamp(24px, 4vw, 34px);
+  grid-template-columns: minmax(0, 0.92fr) minmax(340px, 1.08fr);
+  gap: 24px;
+  align-items: stretch;
+}
+
+.save-capture::after {
+  position: absolute;
+  right: -70px;
+  bottom: -90px;
+  width: 230px;
+  height: 230px;
+  border-radius: 50%;
+  background: rgba(76, 123, 120, 0.13);
+  content: "";
+}
+
+.save-capture-copy,
+.quick-save-form {
+  position: relative;
+  z-index: 1;
+}
+
+.save-capture-copy h2 {
+  max-width: 500px;
+  margin: 0 0 12px;
+  font-family: "Noto Serif SC", Georgia, serif;
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.1;
+}
+
+.save-capture-copy p:not(.eyebrow) {
+  max-width: 520px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.quick-save-form {
+  display: grid;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255, 253, 248, 0.68);
+  gap: 13px;
+}
+
+.quick-save-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.quick-save-form input,
+.quick-save-controls select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  color: var(--ink);
+  background: var(--white);
+  outline: 0;
+}
+
+.quick-save-form input:focus,
+.quick-save-controls select:focus {
+  border-color: rgba(23, 63, 58, 0.32);
+  box-shadow: 0 0 0 4px rgba(23, 63, 58, 0.08);
+}
+
+.quick-save-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.saves-panel {
+  padding: clamp(24px, 4vw, 34px);
+}
+
+.save-count {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.save-list {
+  display: grid;
+  gap: 13px;
+}
+
+.save-card {
+  display: grid;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255, 253, 248, 0.74);
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+}
+
+.save-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.save-source {
+  display: inline-flex;
+  min-height: 25px;
+  padding: 0 9px;
+  border-radius: 999px;
+  color: var(--paper);
+  background: var(--ink);
+  align-items: center;
+  letter-spacing: 0.08em;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.save-source[data-source="xhs"] {
+  background: #b34f32;
+}
+
+.save-source[data-source="instagram"] {
+  background: #7c5bb5;
+}
+
+.save-source[data-source="web"] {
+  background: #4c7b78;
+}
+
+.save-card-meta small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.save-card h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.save-card p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.save-url {
+  display: block;
+  max-width: 100%;
+  margin-top: 8px;
+  overflow: hidden;
+  color: var(--orange-dark);
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.save-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.mini-action {
+  display: inline-flex;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.58);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.mini-action:hover {
+  border-color: rgba(23, 63, 58, 0.18);
+  background: rgba(23, 63, 58, 0.06);
+}
+
 .weather-hero {
   position: relative;
   overflow: hidden;
@@ -2189,6 +2392,10 @@ main {
     grid-template-columns: 1fr;
   }
 
+  .save-capture {
+    grid-template-columns: 1fr;
+  }
+
   .wallet-summary {
     grid-template-columns: 1fr 1fr;
   }
@@ -2493,6 +2700,25 @@ main {
 
   .delete-expense {
     grid-column: 3;
+  }
+
+  .save-capture {
+    padding: 22px 18px;
+    border-radius: 28px;
+    gap: 18px;
+  }
+
+  .quick-save-controls,
+  .save-card {
+    grid-template-columns: 1fr;
+  }
+
+  .save-card {
+    align-items: stretch;
+  }
+
+  .save-card-actions {
+    justify-content: flex-start;
   }
 
   .weather-hero {
@@ -3498,6 +3724,50 @@ main {
   min-height: 48px;
 }
 
+.save-capture {
+  border-color: rgba(255, 255, 255, 0.74);
+  border-radius: 34px;
+  background:
+    radial-gradient(circle at 78% 0%, rgba(189, 216, 198, 0.66), transparent 34%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.82), rgba(249, 246, 240, 0.58)),
+    rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.92) inset,
+    0 22px 64px rgba(55, 47, 38, 0.11);
+  backdrop-filter: blur(30px) saturate(160%);
+  -webkit-backdrop-filter: blur(30px) saturate(160%);
+}
+
+.quick-save-form,
+.save-card {
+  border-color: rgba(69, 60, 50, 0.06);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.64), rgba(255, 251, 245, 0.34)),
+    rgba(248, 244, 238, 0.44);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.74) inset,
+    0 9px 26px rgba(55, 47, 38, 0.055);
+  backdrop-filter: blur(18px) saturate(142%);
+  -webkit-backdrop-filter: blur(18px) saturate(142%);
+}
+
+.quick-save-form input,
+.quick-save-controls select {
+  border-color: rgba(255, 255, 255, 0.62);
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.78) inset;
+}
+
+.save-source,
+.mini-action {
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.22) inset;
+}
+
+.mini-action {
+  border-color: rgba(69, 60, 50, 0.08);
+  background: rgba(255, 255, 255, 0.58);
+}
+
 .weather-hero {
   border-color: rgba(255, 255, 255, 0.28);
   border-radius: 36px;
@@ -4284,6 +4554,20 @@ main {
           <div id="wallet-content"></div>
         </section>
 
+        <section class="view" data-view="saves" aria-label="旅行收藏">
+          <div class="page-intro">
+            <div>
+              <p class="eyebrow">TRIP SAVES</p>
+              <h1>收藏灵感</h1>
+              <p>看到 XHS 或 IG 想去的地方，先存到这里；确定要去时再加入正式行程。</p>
+            </div>
+            <button class="primary-button" id="add-save-button" type="button">
+              <span>+</span> 收藏链接
+            </button>
+          </div>
+          <div id="saves-content"></div>
+        </section>
+
         <section class="view" data-view="weather" aria-label="天气">
           <div class="page-intro">
             <div>
@@ -4314,6 +4598,10 @@ main {
         <button class="nav-item" data-nav="wallet" type="button">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h14a2 2 0 0 1 2 2v11H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3h11" /><path d="M16 11h5v5h-5a2.5 2.5 0 0 1 0-5Z" /></svg>
           <span>钱包</span>
+        </button>
+        <button class="nav-item" data-nav="saves" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12a1 1 0 0 1 1 1v16l-7-4-7 4V5a1 1 0 0 1 1-1Z" /><path d="M9 8h6M9 12h4" /></svg>
+          <span>收藏</span>
         </button>
         <button class="nav-item" data-nav="weather" type="button">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18h10a4 4 0 0 0 .35-7.98A6 6 0 0 0 6 12a3 3 0 0 0 1 6Z" /><path d="M8 6V3M4.5 7.5 2.5 5.5M13 5l1.5-2" /></svg>
@@ -4399,6 +4687,47 @@ main {
       </form>
     </dialog>
 
+    <dialog class="modal" id="save-modal">
+      <form method="dialog" id="save-form">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">TRIP SAVE</p>
+            <h2 id="save-modal-title">收藏灵感</h2>
+          </div>
+          <button class="close-button" value="cancel" type="submit" formnovalidate aria-label="关闭">×</button>
+        </div>
+        <input type="hidden" name="saveId" />
+        <label>标题
+          <input name="title" placeholder="例如 Venice hidden cafe" required />
+        </label>
+        <label>链接
+          <input name="url" inputmode="url" placeholder="粘贴 XHS / IG / 网页链接" />
+        </label>
+        <div class="form-row">
+          <label>来源
+            <select name="source" id="save-source-select" required>
+              <option value="xhs">XHS / 小红书</option>
+              <option value="instagram">Instagram</option>
+              <option value="web">网页</option>
+              <option value="other">其他</option>
+            </select>
+          </label>
+          <label>关联日期
+            <select name="dayId" id="save-day-select"></select>
+          </label>
+        </div>
+        <label>备注
+          <textarea name="note" rows="3" placeholder="为什么想去、推荐菜、拍照角度、开放时间等"></textarea>
+        </label>
+        <div class="modal-actions">
+          <button class="danger-text" id="delete-save-button" type="button" hidden>删除</button>
+          <span class="modal-spacer"></span>
+          <button class="secondary-button" value="cancel" type="submit" formnovalidate>取消</button>
+          <button class="primary-button" value="default" type="submit">保存收藏</button>
+        </div>
+      </form>
+    </dialog>
+
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script>
 const defaultDays = [
@@ -4453,13 +4782,13 @@ const defaultDays = [
     city: "Misurina",
     country: "Italy",
     stay: "Grand Hotel Misurina",
-    theme: "求婚日，Braies 湖与 Tre Cime 蓝调时刻",
+    theme: "Braies 湖与 Tre Cime 蓝调时刻",
     accent: "#4c7b78",
     weatherKey: "misurina",
     items: [
       { id: "d3-1", time: "07:00", title: "早餐", location: "B&B Hotel Passo Tre Croci Cortina", detail: "简单吃，准时出发。07:30 出发要在 08:00 抵达较紧，建议提早。", type: "food", mapQuery: "B&B Hotel Passo Tre Croci Cortina", status: "当天确认" },
       { id: "d3-2", time: "07:30", title: "前往 Lago di Braies", location: "Lago di Braies", detail: "尽早离开，停车按现场容量分配。", type: "car", mapQuery: "Lago di Braies parking", status: "出发前复查" },
-      { id: "d3-3", time: "08:00-11:00", title: "Lago di Braies 求婚", location: "Lago di Braies", detail: "求婚、湖边拍摄、划船与慢节奏相处。这是全程最高优先级。", type: "proposal", mapQuery: "Lago di Braies", status: "已确认" },
+      { id: "d3-3", time: "08:00-11:00", title: "Lago di Braies 湖边慢游", location: "Lago di Braies", detail: "湖边拍摄、划船与慢节奏相处。保留充足时间，不赶行程。", type: "photo", mapQuery: "Lago di Braies", status: "已确认" },
       { id: "d3-4", time: "11:00-12:00", title: "午餐", location: "Braies", detail: "在 Braies 附近简单用餐。", type: "food", mapQuery: "Braies Italy restaurants", status: "当天确认" },
       { id: "d3-5", time: "12:30", title: "酒店入住与休息", location: "Grand Hotel Misurina", detail: "放下行李，短暂休息。", type: "stay", mapQuery: "Grand Hotel Misurina", status: "已确认" },
       { id: "d3-6", time: "14:00", title: "前往 Tre Cime", location: "Rifugio Auronzo", detail: "驾车上山。必须在线预约停车，并登记租车车牌。", type: "car", mapQuery: "Rifugio Auronzo Parking", status: "必须预约" },
@@ -4604,6 +4933,8 @@ const defaultBudgets = [
 
 const defaultExpenses = [];
 
+const defaultSaves = [];
+
 const weatherLocations = {
   dubai: { name: "Dubai", label: "迪拜", latitude: 25.2048, longitude: 55.2708, timezone: "Asia/Dubai", typical: "28-38°C", note: "炎热干燥，室内冷气较强" },
   cortina: { name: "Cortina d'Ampezzo", label: "Cortina", latitude: 46.5405, longitude: 12.1357, timezone: "Europe/Rome", typical: "6-18°C", note: "早晚偏冷，山口风大" },
@@ -4651,7 +4982,8 @@ function loadState() {
     fixedCosts: clone(defaultFixedCosts),
     budgets: clone(defaultBudgets),
     expenses: clone(defaultExpenses),
-    completed: []
+    completed: [],
+    saves: clone(defaultSaves)
   };
 
   try {
@@ -4681,7 +5013,8 @@ function loadState() {
         ? saved.budgets
         : fallback.budgets,
       expenses: migratedExpenses,
-      completed: Array.isArray(saved.completed) ? saved.completed : []
+      completed: Array.isArray(saved.completed) ? saved.completed : [],
+      saves: Array.isArray(saved.saves) ? saved.saves : fallback.saves
     };
   } catch {
     return fallback;
@@ -4816,6 +5149,73 @@ function getBudgetCategoryStats(budget) {
   };
 }
 
+function extractFirstUrl(value) {
+  const match = String(value || "").match(/https?:\/\/[^\s"'<>]+/i);
+  return match ? match[0].replace(/[),.，。]+$/u, "") : "";
+}
+
+function normalizeUrlInput(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  const candidate = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+  try {
+    return new URL(candidate).href;
+  } catch {
+    return raw;
+  }
+}
+
+function titleFromUrl(url) {
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname.replace(/^www\./, "");
+  } catch {
+    return "旅行灵感";
+  }
+}
+
+function removeUrlFromText(text, url) {
+  return String(text || "").replace(url || extractFirstUrl(text), "").trim();
+}
+
+function inferSaveSource(url = "", text = "") {
+  const value = `${url} ${text}`.toLowerCase();
+  if (value.includes("xiaohongshu") || value.includes("xhslink") || value.includes("xhs.cn")) return "xhs";
+  if (value.includes("instagram.com") || value.includes("instagr.am")) return "instagram";
+  if (value.includes("http")) return "web";
+  return "other";
+}
+
+function getSaveSourceLabel(source) {
+  const labels = {
+    xhs: "XHS",
+    instagram: "Instagram",
+    web: "Web",
+    other: "Other"
+  };
+  return labels[source] || labels.other;
+}
+
+function getSaveDayLabel(dayId) {
+  const day = state.days.find(entry => entry.id === dayId);
+  if (!day) return "未安排日期";
+  return `${dateFormatter.format(new Date(`${day.date}T12:00:00`))} · ${day.city}`;
+}
+
+function createSaveRecord({ title, url, source, note, dayId }) {
+  const normalizedUrl = normalizeUrlInput(url);
+  const cleanTitle = String(title || "").trim() || titleFromUrl(normalizedUrl);
+  return {
+    id: `save-${crypto.randomUUID()}`,
+    title: cleanTitle,
+    url: normalizedUrl,
+    source: source || inferSaveSource(normalizedUrl, note),
+    note: String(note || "").trim(),
+    dayId: dayId || "",
+    createdAt: new Date().toISOString()
+  };
+}
+
 function appleMapsPlace(query) {
   return `https://maps.apple.com/?q=${encodeURIComponent(query)}`;
 }
@@ -4861,7 +5261,7 @@ function getLocalDateValue(date = new Date()) {
 }
 
 function switchView(view, updateHash = true) {
-  const validView = ["home", "itinerary", "wallet", "weather"].includes(view) ? view : "home";
+  const validView = ["home", "itinerary", "wallet", "saves", "weather"].includes(view) ? view : "home";
   activeView = validView;
   $$(".view").forEach(section => section.classList.toggle("is-active", section.dataset.view === validView));
   $$(".nav-item").forEach(button => button.classList.toggle("is-active", button.dataset.nav === validView));
@@ -4870,6 +5270,7 @@ function switchView(view, updateHash = true) {
 
   if (validView === "itinerary") renderItinerary();
   if (validView === "wallet") renderWallet();
+  if (validView === "saves") renderSaves();
   if (validView === "weather") renderWeather();
 }
 
@@ -5226,6 +5627,80 @@ function renderWallet() {
   `;
 }
 
+function renderSaves() {
+  const dayOptions = state.days
+    .map(day => `<option value="${day.id}">${getDayNumber(day.date)}日 · ${escapeHtml(day.city)}</option>`)
+    .join("");
+  const saveRows = [...state.saves]
+    .sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")))
+    .map(save => {
+      const createdAt = save.createdAt
+        ? dateFormatter.format(new Date(save.createdAt))
+        : "刚刚";
+      const sourceLabel = getSaveSourceLabel(save.source);
+      const dayLabel = getSaveDayLabel(save.dayId);
+      const urlLabel = save.url ? save.url.replace(/^https?:\/\//, "").replace(/\/$/, "") : "";
+
+      return `
+        <article class="save-card" data-save-id="${save.id}">
+          <div class="save-card-copy">
+            <div class="save-card-meta">
+              <span class="save-source" data-source="${escapeHtml(save.source)}">${escapeHtml(sourceLabel)}</span>
+              <small>${escapeHtml(dayLabel)} · ${escapeHtml(createdAt)}</small>
+            </div>
+            <h3>${escapeHtml(save.title)}</h3>
+            ${save.note ? `<p>${escapeHtml(save.note)}</p>` : ""}
+            ${save.url ? `<a class="save-url" href="${escapeHtml(save.url)}" target="_blank" rel="noreferrer">${escapeHtml(urlLabel)}</a>` : ""}
+          </div>
+          <div class="save-card-actions">
+            ${save.url ? `<a class="mini-action" href="${escapeHtml(save.url)}" target="_blank" rel="noreferrer">打开</a>` : ""}
+            <button class="mini-action edit-save" type="button" data-save-id="${save.id}">编辑</button>
+            <button class="mini-action add-save-to-plan" type="button" data-save-id="${save.id}">加入行程</button>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+
+  $("#saves-content").innerHTML = `
+    <section class="save-capture panel">
+      <div class="save-capture-copy">
+        <p class="eyebrow">SAVE FROM XHS / IG</p>
+        <h2>先收起来，之后再决定要不要去。</h2>
+        <p>iPhone 最稳做法：XHS / IG 点分享，复制链接，回到这里点“从剪贴板粘贴”。支持 Web Share Target 的浏览器也会自动把分享内容带进来。</p>
+      </div>
+      <form class="quick-save-form">
+        <label>链接
+          <input name="url" inputmode="url" placeholder="粘贴 XHS / IG / 网页链接" required />
+        </label>
+        <label>标题
+          <input name="title" placeholder="可留空，自动用网站名称" />
+        </label>
+        <div class="quick-save-controls">
+          <select name="dayId" aria-label="关联日期">
+            <option value="">先不安排日期</option>
+            ${dayOptions}
+          </select>
+          <button class="secondary-button" id="paste-save-button" type="button">从剪贴板粘贴</button>
+          <button class="primary-button" type="submit">保存</button>
+        </div>
+      </form>
+    </section>
+    <section class="panel saves-panel">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">INBOX</p>
+          <h2>已收藏</h2>
+        </div>
+        <span class="save-count">${state.saves.length} 条</span>
+      </div>
+      <div class="save-list">
+        ${saveRows || '<div class="empty-state is-compact">还没有收藏。先从 XHS / IG 复制一个链接，或点右上角“收藏链接”。</div>'}
+      </div>
+    </section>
+  `;
+}
+
 const weatherCodes = {
   0: ["晴朗", "SUN"],
   1: ["大致晴朗", "SUN"],
@@ -5387,6 +5862,10 @@ function populateFormOptions() {
   $("#expense-category").innerHTML = state.budgets
     .map(budget => `<option value="${budget.id}">${escapeHtml(budget.name)}</option>`)
     .join("");
+  $("#save-day-select").innerHTML = [
+    '<option value="">先不安排日期</option>',
+    ...state.days.map(day => `<option value="${day.id}">${dateFormatter.format(new Date(`${day.date}T12:00:00`))} · ${escapeHtml(day.city)}</option>`)
+  ].join("");
 }
 
 function openPlanModal(itemId = null, preferredDayId = null) {
@@ -5529,6 +6008,151 @@ function saveQuickExpenseForm(form) {
   renderHome();
   renderWallet();
   showToast(`已记入 ${formatMoney(amount)}`);
+}
+
+function openSaveModal(saveId = null) {
+  const modal = $("#save-modal");
+  const form = $("#save-form");
+  form.reset();
+  form.elements.saveId.value = saveId || "";
+  $("#delete-save-button").hidden = !saveId;
+  $("#save-modal-title").textContent = saveId ? "编辑收藏" : "收藏灵感";
+
+  if (saveId) {
+    const save = state.saves.find(entry => entry.id === saveId);
+    if (!save) return;
+    form.elements.title.value = save.title;
+    form.elements.url.value = save.url || "";
+    form.elements.source.value = save.source || "other";
+    form.elements.dayId.value = save.dayId || "";
+    form.elements.note.value = save.note || "";
+  } else {
+    const next = getNextPlan();
+    form.elements.source.value = "web";
+    form.elements.dayId.value = next?.day.id || "";
+  }
+
+  modal.showModal();
+  setTimeout(() => form.elements.url.focus(), 50);
+}
+
+function saveSaveForm() {
+  const form = $("#save-form");
+  const data = new FormData(form);
+  const saveId = String(data.get("saveId") || "");
+  const record = {
+    title: String(data.get("title")).trim(),
+    url: normalizeUrlInput(data.get("url")),
+    source: String(data.get("source") || "other"),
+    note: String(data.get("note") || "").trim(),
+    dayId: String(data.get("dayId") || "")
+  };
+
+  if (saveId) {
+    const save = state.saves.find(entry => entry.id === saveId);
+    if (!save) return;
+    Object.assign(save, record, { updatedAt: new Date().toISOString() });
+  } else {
+    state.saves.unshift(createSaveRecord(record));
+  }
+
+  saveState();
+  renderSaves();
+  showToast(saveId ? "收藏已更新" : "收藏已保存");
+}
+
+function saveQuickSaveForm(form) {
+  const url = normalizeUrlInput(form.elements.url.value);
+  if (!url) {
+    showToast("请先粘贴链接");
+    form.elements.url.focus();
+    return;
+  }
+
+  const title = String(form.elements.title.value || "").trim() || titleFromUrl(url);
+  state.saves.unshift(createSaveRecord({
+    title,
+    url,
+    source: inferSaveSource(url),
+    note: "",
+    dayId: String(form.elements.dayId.value || "")
+  }));
+  form.reset();
+  saveState();
+  renderSaves();
+  showToast("收藏已保存");
+}
+
+async function pasteSaveFromClipboard() {
+  const form = $(".quick-save-form");
+  if (!form) return;
+
+  try {
+    const clipboardText = await navigator.clipboard.readText();
+    const url = extractFirstUrl(clipboardText) || clipboardText.trim();
+    if (!url) {
+      showToast("剪贴板里没有链接");
+      return;
+    }
+
+    const normalizedUrl = normalizeUrlInput(url);
+    const title = removeUrlFromText(clipboardText, url);
+    form.elements.url.value = normalizedUrl;
+    form.elements.title.value = title || titleFromUrl(normalizedUrl);
+    showToast("已从剪贴板带入");
+  } catch {
+    showToast("无法读取剪贴板，请手动粘贴");
+  }
+}
+
+function deleteSave(saveId) {
+  state.saves = state.saves.filter(save => save.id !== saveId);
+  saveState();
+  renderSaves();
+  $("#save-modal").close();
+  showToast("收藏已删除");
+}
+
+function openPlanFromSave(saveId) {
+  const save = state.saves.find(entry => entry.id === saveId);
+  if (!save) return;
+  openPlanModal(null, save.dayId || null);
+  const form = $("#plan-form");
+  form.elements.status.value = "可选";
+  form.elements.title.value = save.title;
+  form.elements.location.value = save.title;
+  form.elements.detail.value = [save.note, save.url].filter(Boolean).join("\n");
+}
+
+function captureIncomingShare() {
+  const params = new URLSearchParams(location.search);
+  const rawTitle = params.get("title") || "";
+  const rawText = params.get("text") || "";
+  const rawUrl = params.get("url") || extractFirstUrl(rawText) || extractFirstUrl(rawTitle);
+  const hasSharePayload = rawTitle || rawText || rawUrl;
+  if (!hasSharePayload) return false;
+
+  const url = normalizeUrlInput(rawUrl);
+  const titleFromText = removeUrlFromText(rawText, rawUrl);
+  const title = rawTitle || titleFromText || titleFromUrl(url);
+  const note = rawText && rawText !== rawUrl && rawText !== title ? rawText : "";
+  const duplicate = url && state.saves.find(save => save.url === url);
+
+  if (!duplicate) {
+    state.saves.unshift(createSaveRecord({
+      title,
+      url,
+      source: inferSaveSource(url, rawText),
+      note,
+      dayId: ""
+    }));
+    saveState("分享已保存");
+  }
+
+  history.replaceState(null, "", `${location.pathname}#saves`);
+  activeView = "saves";
+  showToast(duplicate ? "这条已经收藏过" : "分享已加入收藏");
+  return true;
 }
 
 function startDrag(event, handle) {
@@ -5680,6 +6304,28 @@ function handleClick(event) {
     return;
   }
 
+  if (event.target.closest("#add-save-button")) {
+    openSaveModal();
+    return;
+  }
+
+  if (event.target.closest("#paste-save-button")) {
+    pasteSaveFromClipboard();
+    return;
+  }
+
+  const editSave = event.target.closest(".edit-save");
+  if (editSave) {
+    openSaveModal(editSave.dataset.saveId);
+    return;
+  }
+
+  const addSaveToPlan = event.target.closest(".add-save-to-plan");
+  if (addSaveToPlan) {
+    openPlanFromSave(addSaveToPlan.dataset.saveId);
+    return;
+  }
+
   const categoryExpense = event.target.closest("[data-add-expense-category]");
   if (categoryExpense) {
     openExpenseModal(categoryExpense.dataset.addExpenseCategory);
@@ -5757,6 +6403,29 @@ function setupForms() {
     saveQuickExpenseForm(quickExpenseForm);
   });
 
+  $("#saves-content").addEventListener("submit", event => {
+    const quickSaveForm = event.target.closest(".quick-save-form");
+    if (!quickSaveForm) return;
+    event.preventDefault();
+    saveQuickSaveForm(quickSaveForm);
+  });
+
+  $("#save-form").addEventListener("submit", event => {
+    event.preventDefault();
+    if (event.submitter?.value === "cancel") {
+      $("#save-modal").close();
+      return;
+    }
+    if (!event.currentTarget.reportValidity()) return;
+    saveSaveForm();
+    $("#save-modal").close();
+  });
+
+  $("#delete-save-button").addEventListener("click", () => {
+    const saveId = $("#save-form").elements.saveId.value;
+    if (saveId) deleteSave(saveId);
+  });
+
   $$(".modal").forEach(modal => {
     modal.addEventListener("click", event => {
       if (event.target === modal) modal.close();
@@ -5823,14 +6492,16 @@ function setupLiquidGlassNavigation() {
 
 function init() {
   populateFormOptions();
+  const capturedShare = captureIncomingShare();
   renderHome();
   renderItinerary();
   renderWallet();
+  renderSaves();
   renderWeather();
   setupForms();
   setupInstall();
   setupLiquidGlassNavigation();
-  switchView(activeView, false);
+  switchView(capturedShare ? "saves" : activeView, false);
 
   document.addEventListener("click", handleClick);
   document.addEventListener("pointerdown", event => {

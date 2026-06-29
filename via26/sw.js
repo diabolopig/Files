@@ -1,4 +1,4 @@
-const CACHE_NAME = "trip-assistant-v10-wallet-entry";
+const CACHE_NAME = "trip-assistant-v11-saves-private";
 const APP_SHELL = [
   "./",
   "./index.html",

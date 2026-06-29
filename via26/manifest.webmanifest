@@ -9,6 +9,29 @@
   "background_color": "#f3efe8",
   "theme_color": "#f3efe8",
   "orientation": "portrait",
+  "share_target": {
+    "action": "./",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "shortcuts": [
+    {
+      "name": "收藏旅行灵感",
+      "short_name": "收藏",
+      "description": "快速打开收藏灵感页面",
+      "url": "./#saves",
+      "icons": [
+        {
+          "src": "./icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
   "icons": [
     {
       "src": "./icon-192.png",

@@ -4,6 +4,7 @@ import {
   defaultDays,
   defaultExpenses,
   defaultFixedCosts,
+  defaultSaves,
   weatherLocations
 } from "./data.js";
 
@@ -39,7 +40,8 @@ function loadState() {
     fixedCosts: clone(defaultFixedCosts),
     budgets: clone(defaultBudgets),
     expenses: clone(defaultExpenses),
-    completed: []
+    completed: [],
+    saves: clone(defaultSaves)
   };
 
   try {
@@ -69,7 +71,8 @@ function loadState() {
         ? saved.budgets
         : fallback.budgets,
       expenses: migratedExpenses,
-      completed: Array.isArray(saved.completed) ? saved.completed : []
+      completed: Array.isArray(saved.completed) ? saved.completed : [],
+      saves: Array.isArray(saved.saves) ? saved.saves : fallback.saves
     };
   } catch {
     return fallback;
@@ -204,6 +207,73 @@ function getBudgetCategoryStats(budget) {
   };
 }
 
+function extractFirstUrl(value) {
+  const match = String(value || "").match(/https?:\/\/[^\s"'<>]+/i);
+  return match ? match[0].replace(/[),.，。]+$/u, "") : "";
+}
+
+function normalizeUrlInput(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  const candidate = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+  try {
+    return new URL(candidate).href;
+  } catch {
+    return raw;
+  }
+}
+
+function titleFromUrl(url) {
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname.replace(/^www\./, "");
+  } catch {
+    return "旅行灵感";
+  }
+}
+
+function removeUrlFromText(text, url) {
+  return String(text || "").replace(url || extractFirstUrl(text), "").trim();
+}
+
+function inferSaveSource(url = "", text = "") {
+  const value = `${url} ${text}`.toLowerCase();
+  if (value.includes("xiaohongshu") || value.includes("xhslink") || value.includes("xhs.cn")) return "xhs";
+  if (value.includes("instagram.com") || value.includes("instagr.am")) return "instagram";
+  if (value.includes("http")) return "web";
+  return "other";
+}
+
+function getSaveSourceLabel(source) {
+  const labels = {
+    xhs: "XHS",
+    instagram: "Instagram",
+    web: "Web",
+    other: "Other"
+  };
+  return labels[source] || labels.other;
+}
+
+function getSaveDayLabel(dayId) {
+  const day = state.days.find(entry => entry.id === dayId);
+  if (!day) return "未安排日期";
+  return `${dateFormatter.format(new Date(`${day.date}T12:00:00`))} · ${day.city}`;
+}
+
+function createSaveRecord({ title, url, source, note, dayId }) {
+  const normalizedUrl = normalizeUrlInput(url);
+  const cleanTitle = String(title || "").trim() || titleFromUrl(normalizedUrl);
+  return {
+    id: `save-${crypto.randomUUID()}`,
+    title: cleanTitle,
+    url: normalizedUrl,
+    source: source || inferSaveSource(normalizedUrl, note),
+    note: String(note || "").trim(),
+    dayId: dayId || "",
+    createdAt: new Date().toISOString()
+  };
+}
+
 function appleMapsPlace(query) {
   return `https://maps.apple.com/?q=${encodeURIComponent(query)}`;
 }
@@ -249,7 +319,7 @@ function getLocalDateValue(date = new Date()) {
 }
 
 function switchView(view, updateHash = true) {
-  const validView = ["home", "itinerary", "wallet", "weather"].includes(view) ? view : "home";
+  const validView = ["home", "itinerary", "wallet", "saves", "weather"].includes(view) ? view : "home";
   activeView = validView;
   $$(".view").forEach(section => section.classList.toggle("is-active", section.dataset.view === validView));
   $$(".nav-item").forEach(button => button.classList.toggle("is-active", button.dataset.nav === validView));
@@ -258,6 +328,7 @@ function switchView(view, updateHash = true) {
 
   if (validView === "itinerary") renderItinerary();
   if (validView === "wallet") renderWallet();
+  if (validView === "saves") renderSaves();
   if (validView === "weather") renderWeather();
 }
 
@@ -614,6 +685,80 @@ function renderWallet() {
   `;
 }
 
+function renderSaves() {
+  const dayOptions = state.days
+    .map(day => `<option value="${day.id}">${getDayNumber(day.date)}日 · ${escapeHtml(day.city)}</option>`)
+    .join("");
+  const saveRows = [...state.saves]
+    .sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")))
+    .map(save => {
+      const createdAt = save.createdAt
+        ? dateFormatter.format(new Date(save.createdAt))
+        : "刚刚";
+      const sourceLabel = getSaveSourceLabel(save.source);
+      const dayLabel = getSaveDayLabel(save.dayId);
+      const urlLabel = save.url ? save.url.replace(/^https?:\/\//, "").replace(/\/$/, "") : "";
+
+      return `
+        <article class="save-card" data-save-id="${save.id}">
+          <div class="save-card-copy">
+            <div class="save-card-meta">
+              <span class="save-source" data-source="${escapeHtml(save.source)}">${escapeHtml(sourceLabel)}</span>
+              <small>${escapeHtml(dayLabel)} · ${escapeHtml(createdAt)}</small>
+            </div>
+            <h3>${escapeHtml(save.title)}</h3>
+            ${save.note ? `<p>${escapeHtml(save.note)}</p>` : ""}
+            ${save.url ? `<a class="save-url" href="${escapeHtml(save.url)}" target="_blank" rel="noreferrer">${escapeHtml(urlLabel)}</a>` : ""}
+          </div>
+          <div class="save-card-actions">
+            ${save.url ? `<a class="mini-action" href="${escapeHtml(save.url)}" target="_blank" rel="noreferrer">打开</a>` : ""}
+            <button class="mini-action edit-save" type="button" data-save-id="${save.id}">编辑</button>
+            <button class="mini-action add-save-to-plan" type="button" data-save-id="${save.id}">加入行程</button>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+
+  $("#saves-content").innerHTML = `
+    <section class="save-capture panel">
+      <div class="save-capture-copy">
+        <p class="eyebrow">SAVE FROM XHS / IG</p>
+        <h2>先收起来，之后再决定要不要去。</h2>
+        <p>iPhone 最稳做法：XHS / IG 点分享，复制链接，回到这里点“从剪贴板粘贴”。支持 Web Share Target 的浏览器也会自动把分享内容带进来。</p>
+      </div>
+      <form class="quick-save-form">
+        <label>链接
+          <input name="url" inputmode="url" placeholder="粘贴 XHS / IG / 网页链接" required />
+        </label>
+        <label>标题
+          <input name="title" placeholder="可留空，自动用网站名称" />
+        </label>
+        <div class="quick-save-controls">
+          <select name="dayId" aria-label="关联日期">
+            <option value="">先不安排日期</option>
+            ${dayOptions}
+          </select>
+          <button class="secondary-button" id="paste-save-button" type="button">从剪贴板粘贴</button>
+          <button class="primary-button" type="submit">保存</button>
+        </div>
+      </form>
+    </section>
+    <section class="panel saves-panel">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">INBOX</p>
+          <h2>已收藏</h2>
+        </div>
+        <span class="save-count">${state.saves.length} 条</span>
+      </div>
+      <div class="save-list">
+        ${saveRows || '<div class="empty-state is-compact">还没有收藏。先从 XHS / IG 复制一个链接，或点右上角“收藏链接”。</div>'}
+      </div>
+    </section>
+  `;
+}
+
 const weatherCodes = {
   0: ["晴朗", "SUN"],
   1: ["大致晴朗", "SUN"],
@@ -775,6 +920,10 @@ function populateFormOptions() {
   $("#expense-category").innerHTML = state.budgets
     .map(budget => `<option value="${budget.id}">${escapeHtml(budget.name)}</option>`)
     .join("");
+  $("#save-day-select").innerHTML = [
+    '<option value="">先不安排日期</option>',
+    ...state.days.map(day => `<option value="${day.id}">${dateFormatter.format(new Date(`${day.date}T12:00:00`))} · ${escapeHtml(day.city)}</option>`)
+  ].join("");
 }
 
 function openPlanModal(itemId = null, preferredDayId = null) {
@@ -917,6 +1066,151 @@ function saveQuickExpenseForm(form) {
   renderHome();
   renderWallet();
   showToast(`已记入 ${formatMoney(amount)}`);
+}
+
+function openSaveModal(saveId = null) {
+  const modal = $("#save-modal");
+  const form = $("#save-form");
+  form.reset();
+  form.elements.saveId.value = saveId || "";
+  $("#delete-save-button").hidden = !saveId;
+  $("#save-modal-title").textContent = saveId ? "编辑收藏" : "收藏灵感";
+
+  if (saveId) {
+    const save = state.saves.find(entry => entry.id === saveId);
+    if (!save) return;
+    form.elements.title.value = save.title;
+    form.elements.url.value = save.url || "";
+    form.elements.source.value = save.source || "other";
+    form.elements.dayId.value = save.dayId || "";
+    form.elements.note.value = save.note || "";
+  } else {
+    const next = getNextPlan();
+    form.elements.source.value = "web";
+    form.elements.dayId.value = next?.day.id || "";
+  }
+
+  modal.showModal();
+  setTimeout(() => form.elements.url.focus(), 50);
+}
+
+function saveSaveForm() {
+  const form = $("#save-form");
+  const data = new FormData(form);
+  const saveId = String(data.get("saveId") || "");
+  const record = {
+    title: String(data.get("title")).trim(),
+    url: normalizeUrlInput(data.get("url")),
+    source: String(data.get("source") || "other"),
+    note: String(data.get("note") || "").trim(),
+    dayId: String(data.get("dayId") || "")
+  };
+
+  if (saveId) {
+    const save = state.saves.find(entry => entry.id === saveId);
+    if (!save) return;
+    Object.assign(save, record, { updatedAt: new Date().toISOString() });
+  } else {
+    state.saves.unshift(createSaveRecord(record));
+  }
+
+  saveState();
+  renderSaves();
+  showToast(saveId ? "收藏已更新" : "收藏已保存");
+}
+
+function saveQuickSaveForm(form) {
+  const url = normalizeUrlInput(form.elements.url.value);
+  if (!url) {
+    showToast("请先粘贴链接");
+    form.elements.url.focus();
+    return;
+  }
+
+  const title = String(form.elements.title.value || "").trim() || titleFromUrl(url);
+  state.saves.unshift(createSaveRecord({
+    title,
+    url,
+    source: inferSaveSource(url),
+    note: "",
+    dayId: String(form.elements.dayId.value || "")
+  }));
+  form.reset();
+  saveState();
+  renderSaves();
+  showToast("收藏已保存");
+}
+
+async function pasteSaveFromClipboard() {
+  const form = $(".quick-save-form");
+  if (!form) return;
+
+  try {
+    const clipboardText = await navigator.clipboard.readText();
+    const url = extractFirstUrl(clipboardText) || clipboardText.trim();
+    if (!url) {
+      showToast("剪贴板里没有链接");
+      return;
+    }
+
+    const normalizedUrl = normalizeUrlInput(url);
+    const title = removeUrlFromText(clipboardText, url);
+    form.elements.url.value = normalizedUrl;
+    form.elements.title.value = title || titleFromUrl(normalizedUrl);
+    showToast("已从剪贴板带入");
+  } catch {
+    showToast("无法读取剪贴板，请手动粘贴");
+  }
+}
+
+function deleteSave(saveId) {
+  state.saves = state.saves.filter(save => save.id !== saveId);
+  saveState();
+  renderSaves();
+  $("#save-modal").close();
+  showToast("收藏已删除");
+}
+
+function openPlanFromSave(saveId) {
+  const save = state.saves.find(entry => entry.id === saveId);
+  if (!save) return;
+  openPlanModal(null, save.dayId || null);
+  const form = $("#plan-form");
+  form.elements.status.value = "可选";
+  form.elements.title.value = save.title;
+  form.elements.location.value = save.title;
+  form.elements.detail.value = [save.note, save.url].filter(Boolean).join("\n");
+}
+
+function captureIncomingShare() {
+  const params = new URLSearchParams(location.search);
+  const rawTitle = params.get("title") || "";
+  const rawText = params.get("text") || "";
+  const rawUrl = params.get("url") || extractFirstUrl(rawText) || extractFirstUrl(rawTitle);
+  const hasSharePayload = rawTitle || rawText || rawUrl;
+  if (!hasSharePayload) return false;
+
+  const url = normalizeUrlInput(rawUrl);
+  const titleFromText = removeUrlFromText(rawText, rawUrl);
+  const title = rawTitle || titleFromText || titleFromUrl(url);
+  const note = rawText && rawText !== rawUrl && rawText !== title ? rawText : "";
+  const duplicate = url && state.saves.find(save => save.url === url);
+
+  if (!duplicate) {
+    state.saves.unshift(createSaveRecord({
+      title,
+      url,
+      source: inferSaveSource(url, rawText),
+      note,
+      dayId: ""
+    }));
+    saveState("分享已保存");
+  }
+
+  history.replaceState(null, "", `${location.pathname}#saves`);
+  activeView = "saves";
+  showToast(duplicate ? "这条已经收藏过" : "分享已加入收藏");
+  return true;
 }
 
 function startDrag(event, handle) {
@@ -1068,6 +1362,28 @@ function handleClick(event) {
     return;
   }
 
+  if (event.target.closest("#add-save-button")) {
+    openSaveModal();
+    return;
+  }
+
+  if (event.target.closest("#paste-save-button")) {
+    pasteSaveFromClipboard();
+    return;
+  }
+
+  const editSave = event.target.closest(".edit-save");
+  if (editSave) {
+    openSaveModal(editSave.dataset.saveId);
+    return;
+  }
+
+  const addSaveToPlan = event.target.closest(".add-save-to-plan");
+  if (addSaveToPlan) {
+    openPlanFromSave(addSaveToPlan.dataset.saveId);
+    return;
+  }
+
   const categoryExpense = event.target.closest("[data-add-expense-category]");
   if (categoryExpense) {
     openExpenseModal(categoryExpense.dataset.addExpenseCategory);
@@ -1145,6 +1461,29 @@ function setupForms() {
     saveQuickExpenseForm(quickExpenseForm);
   });
 
+  $("#saves-content").addEventListener("submit", event => {
+    const quickSaveForm = event.target.closest(".quick-save-form");
+    if (!quickSaveForm) return;
+    event.preventDefault();
+    saveQuickSaveForm(quickSaveForm);
+  });
+
+  $("#save-form").addEventListener("submit", event => {
+    event.preventDefault();
+    if (event.submitter?.value === "cancel") {
+      $("#save-modal").close();
+      return;
+    }
+    if (!event.currentTarget.reportValidity()) return;
+    saveSaveForm();
+    $("#save-modal").close();
+  });
+
+  $("#delete-save-button").addEventListener("click", () => {
+    const saveId = $("#save-form").elements.saveId.value;
+    if (saveId) deleteSave(saveId);
+  });
+
   $$(".modal").forEach(modal => {
     modal.addEventListener("click", event => {
       if (event.target === modal) modal.close();
@@ -1211,14 +1550,16 @@ function setupLiquidGlassNavigation() {
 
 function init() {
   populateFormOptions();
+  const capturedShare = captureIncomingShare();
   renderHome();
   renderItinerary();
   renderWallet();
+  renderSaves();
   renderWeather();
   setupForms();
   setupInstall();
   setupLiquidGlassNavigation();
-  switchView(activeView, false);
+  switchView(capturedShare ? "saves" : activeView, false);
 
   document.addEventListener("click", handleClick);
   document.addEventListener("pointerdown", event => {

@@ -50,13 +50,13 @@ export const defaultDays = [
     city: "Misurina",
     country: "Italy",
     stay: "Grand Hotel Misurina",
-    theme: "求婚日，Braies 湖与 Tre Cime 蓝调时刻",
+    theme: "Braies 湖与 Tre Cime 蓝调时刻",
     accent: "#4c7b78",
     weatherKey: "misurina",
     items: [
       { id: "d3-1", time: "07:00", title: "早餐", location: "B&B Hotel Passo Tre Croci Cortina", detail: "简单吃，准时出发。07:30 出发要在 08:00 抵达较紧，建议提早。", type: "food", mapQuery: "B&B Hotel Passo Tre Croci Cortina", status: "当天确认" },
       { id: "d3-2", time: "07:30", title: "前往 Lago di Braies", location: "Lago di Braies", detail: "尽早离开，停车按现场容量分配。", type: "car", mapQuery: "Lago di Braies parking", status: "出发前复查" },
-      { id: "d3-3", time: "08:00-11:00", title: "Lago di Braies 求婚", location: "Lago di Braies", detail: "求婚、湖边拍摄、划船与慢节奏相处。这是全程最高优先级。", type: "proposal", mapQuery: "Lago di Braies", status: "已确认" },
+      { id: "d3-3", time: "08:00-11:00", title: "Lago di Braies 湖边慢游", location: "Lago di Braies", detail: "湖边拍摄、划船与慢节奏相处。保留充足时间，不赶行程。", type: "photo", mapQuery: "Lago di Braies", status: "已确认" },
       { id: "d3-4", time: "11:00-12:00", title: "午餐", location: "Braies", detail: "在 Braies 附近简单用餐。", type: "food", mapQuery: "Braies Italy restaurants", status: "当天确认" },
       { id: "d3-5", time: "12:30", title: "酒店入住与休息", location: "Grand Hotel Misurina", detail: "放下行李，短暂休息。", type: "stay", mapQuery: "Grand Hotel Misurina", status: "已确认" },
       { id: "d3-6", time: "14:00", title: "前往 Tre Cime", location: "Rifugio Auronzo", detail: "驾车上山。必须在线预约停车，并登记租车车牌。", type: "car", mapQuery: "Rifugio Auronzo Parking", status: "必须预约" },
@@ -200,6 +200,8 @@ export const defaultBudgets = [
 ];
 
 export const defaultExpenses = [];
+
+export const defaultSaves = [];
 
 export const weatherLocations = {
   dubai: { name: "Dubai", label: "迪拜", latitude: 25.2048, longitude: 55.2708, timezone: "Asia/Dubai", typical: "28-38°C", note: "炎热干燥，室内冷气较强" },

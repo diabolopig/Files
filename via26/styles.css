@@ -1749,6 +1749,209 @@ main {
   font-size: 10px;
 }
 
+.save-capture {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  margin-bottom: 26px;
+  padding: clamp(24px, 4vw, 34px);
+  grid-template-columns: minmax(0, 0.92fr) minmax(340px, 1.08fr);
+  gap: 24px;
+  align-items: stretch;
+}
+
+.save-capture::after {
+  position: absolute;
+  right: -70px;
+  bottom: -90px;
+  width: 230px;
+  height: 230px;
+  border-radius: 50%;
+  background: rgba(76, 123, 120, 0.13);
+  content: "";
+}
+
+.save-capture-copy,
+.quick-save-form {
+  position: relative;
+  z-index: 1;
+}
+
+.save-capture-copy h2 {
+  max-width: 500px;
+  margin: 0 0 12px;
+  font-family: "Noto Serif SC", Georgia, serif;
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.1;
+}
+
+.save-capture-copy p:not(.eyebrow) {
+  max-width: 520px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.quick-save-form {
+  display: grid;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255, 253, 248, 0.68);
+  gap: 13px;
+}
+
+.quick-save-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.quick-save-form input,
+.quick-save-controls select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  color: var(--ink);
+  background: var(--white);
+  outline: 0;
+}
+
+.quick-save-form input:focus,
+.quick-save-controls select:focus {
+  border-color: rgba(23, 63, 58, 0.32);
+  box-shadow: 0 0 0 4px rgba(23, 63, 58, 0.08);
+}
+
+.quick-save-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.saves-panel {
+  padding: clamp(24px, 4vw, 34px);
+}
+
+.save-count {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.save-list {
+  display: grid;
+  gap: 13px;
+}
+
+.save-card {
+  display: grid;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255, 253, 248, 0.74);
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+}
+
+.save-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.save-source {
+  display: inline-flex;
+  min-height: 25px;
+  padding: 0 9px;
+  border-radius: 999px;
+  color: var(--paper);
+  background: var(--ink);
+  align-items: center;
+  letter-spacing: 0.08em;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.save-source[data-source="xhs"] {
+  background: #b34f32;
+}
+
+.save-source[data-source="instagram"] {
+  background: #7c5bb5;
+}
+
+.save-source[data-source="web"] {
+  background: #4c7b78;
+}
+
+.save-card-meta small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.save-card h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.save-card p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.save-url {
+  display: block;
+  max-width: 100%;
+  margin-top: 8px;
+  overflow: hidden;
+  color: var(--orange-dark);
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.save-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.mini-action {
+  display: inline-flex;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.58);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.mini-action:hover {
+  border-color: rgba(23, 63, 58, 0.18);
+  background: rgba(23, 63, 58, 0.06);
+}
+
 .weather-hero {
   position: relative;
   overflow: hidden;
@@ -2177,6 +2380,10 @@ main {
     grid-template-columns: 1fr;
   }
 
+  .save-capture {
+    grid-template-columns: 1fr;
+  }
+
   .wallet-summary {
     grid-template-columns: 1fr 1fr;
   }
@@ -2481,6 +2688,25 @@ main {
 
   .delete-expense {
     grid-column: 3;
+  }
+
+  .save-capture {
+    padding: 22px 18px;
+    border-radius: 28px;
+    gap: 18px;
+  }
+
+  .quick-save-controls,
+  .save-card {
+    grid-template-columns: 1fr;
+  }
+
+  .save-card {
+    align-items: stretch;
+  }
+
+  .save-card-actions {
+    justify-content: flex-start;
   }
 
   .weather-hero {
