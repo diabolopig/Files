@@ -7,14 +7,14 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="旅行助手" />
-    <meta name="description" content="Dubai, Dolomites 与 Venice 的私人旅行助手。" />
+    <meta name="description" content="可以建立多趟旅程、记录预算、收藏灵感与查看每日行程的旅行助手。" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./icon.svg" type="image/svg+xml" />
     <link rel="icon" href="./icon-192.png" sizes="192x192" type="image/png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
     <link rel="stylesheet" href="./styles.css" />
     <link rel="stylesheet" href="./ios27.css" />
-    <title>Dubai-Dolomites-Venice 旅行助手</title>
+    <title>旅行助手</title>
   </head>
   <body>
     <div class="app-shell">
@@ -23,13 +23,29 @@
           <span class="brand-mark">旅</span>
           <span>
             <strong>旅行助手</strong>
-            <small>Dubai · Dolomites · Venice</small>
+            <small>Trip planner</small>
           </span>
         </a>
       </header>
 
       <main id="app">
         <section class="view is-active" data-view="home" aria-label="旅行总览">
+          <section class="trip-hub panel">
+            <div>
+              <p class="eyebrow">MY TRIPS</p>
+              <h2 id="active-trip-name">旅行助手</h2>
+              <p id="active-trip-meta">选择一个旅程继续，或建立新的旅程。</p>
+            </div>
+            <div class="trip-hub-actions">
+              <label class="trip-select-label">当前旅程
+                <select id="trip-select" aria-label="选择旅程"></select>
+              </label>
+              <button class="primary-button" id="new-trip-button" type="button">
+                <span>+</span> 新建旅程
+              </button>
+            </div>
+          </section>
+
           <div class="hero">
             <div class="hero-scenes" aria-hidden="true">
               <span class="hero-scene scene-dubai"></span>
@@ -37,14 +53,14 @@
               <span class="hero-scene scene-venice"></span>
             </div>
             <div class="hero-copy">
-              <p class="eyebrow">21 - 28 SEP 2026</p>
-              <h1>从沙漠到山脊，<br />再走进水城。</h1>
-              <p class="hero-note">Dubai <span>·</span> Dolomites <span>·</span> Venice</p>
+              <p class="eyebrow" id="hero-date-label">DATES TBD</p>
+              <h1 id="hero-title">新的旅程，从这里开始。</h1>
+              <p class="hero-note" id="hero-destinations">待安排目的地</p>
             </div>
             <div class="route-art" aria-hidden="true">
-              <span class="route-label route-label-dxb">DXB</span>
-              <span class="route-label route-label-dol">DOLOMITES</span>
-              <span class="route-label route-label-vce">VCE</span>
+              <span class="route-label route-label-dxb" id="route-label-start">START</span>
+              <span class="route-label route-label-dol" id="route-label-mid">PLAN</span>
+              <span class="route-label route-label-vce" id="route-label-end">GO</span>
               <svg viewBox="0 0 520 240" role="img">
                 <path class="route-path-shadow" d="M18 175 C122 36 202 222 289 101 C355 9 414 88 496 40" />
                 <path class="route-path" d="M18 175 C122 36 202 222 289 101 C355 9 414 88 496 40" />
@@ -64,7 +80,7 @@
               <div class="section-heading">
                 <div>
                   <p class="eyebrow">THE JOURNEY</p>
-                  <h2>八天，一条路线</h2>
+                  <h2 id="journey-heading">旅程路线</h2>
                 </div>
                 <button class="text-button" data-go="itinerary" type="button">查看全部</button>
               </div>
@@ -211,6 +227,43 @@
           <span class="modal-spacer"></span>
           <button class="secondary-button" value="cancel" type="submit" formnovalidate>取消</button>
           <button class="primary-button" value="default" type="submit">保存行程</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="trip-modal">
+      <form method="dialog" id="trip-form">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">NEW TRIP</p>
+            <h2>建立新的旅程</h2>
+          </div>
+          <button class="close-button" value="cancel" type="submit" formnovalidate aria-label="关闭">×</button>
+        </div>
+        <label>旅程名称
+          <input name="name" placeholder="例如 Tokyo Autumn 2027" required />
+        </label>
+        <label>目的地
+          <input name="destinations" placeholder="例如 Tokyo · Kyoto · Osaka" required />
+        </label>
+        <div class="form-row">
+          <label>开始日期
+            <input name="startDate" type="date" required />
+          </label>
+          <label>结束日期
+            <input name="endDate" type="date" required />
+          </label>
+        </div>
+        <label>旅途预算（RM，可之后再改）
+          <input name="budget" inputmode="decimal" type="number" min="0" step="0.01" placeholder="例如 5000" />
+        </label>
+        <label>首页标题
+          <input name="heroTitle" placeholder="例如 秋天的东京，从咖啡开始。" />
+        </label>
+        <div class="modal-actions">
+          <span class="modal-spacer"></span>
+          <button class="secondary-button" value="cancel" type="submit" formnovalidate>取消</button>
+          <button class="primary-button" value="default" type="submit">建立旅程</button>
         </div>
       </form>
     </dialog>

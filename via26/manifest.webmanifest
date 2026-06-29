@@ -1,7 +1,7 @@
 {
-  "name": "Dubai Dolomites Venice 旅行助手",
+  "name": "旅行助手",
   "short_name": "旅行助手",
-  "description": "Dubai, Dolomites 与 Venice 私人旅行助手",
+  "description": "建立多趟旅程、记录预算、收藏灵感与查看每日行程",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

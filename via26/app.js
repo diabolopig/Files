@@ -9,7 +9,8 @@ import {
 } from "./data.js";
 
 const STORAGE_KEY = "via26-state-v1";
-const STATE_VERSION = 2;
+const STATE_VERSION = 3;
+const DEFAULT_TRIP_ID = "trip-dubai-dolomites-venice-2026";
 const WEATHER_KEY = "via26-weather-v1";
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
@@ -33,47 +34,214 @@ const escapeHtml = value =>
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 
-function loadState() {
+function migrateExpenses(expenses = []) {
+  const currentBudgetIds = new Set(defaultBudgets.map(budget => budget.id));
+  return Array.isArray(expenses)
+    ? expenses
+        .filter(expense => expense.id !== "expense-fixed" && expense.category !== "fixed")
+        .map(expense => {
+          if (currentBudgetIds.has(expense.category)) return expense;
+          if (expense.category === "transport") return { ...expense, category: "parking" };
+          if (expense.category === "activity") return { ...expense, category: "gondola" };
+          return expense.category ? expense : null;
+        })
+        .filter(Boolean)
+    : [];
+}
+
+function splitDestinations(value) {
+  return String(value || "")
+    .split(/[·,，、/|\n]+/)
+    .map(item => item.trim())
+    .filter(Boolean);
+}
+
+function toDateInputValue(date) {
+  const copy = new Date(date);
+  const year = copy.getFullYear();
+  const month = String(copy.getMonth() + 1).padStart(2, "0");
+  const day = String(copy.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function addDays(dateValue, offset) {
+  const date = new Date(`${dateValue}T12:00:00`);
+  date.setDate(date.getDate() + offset);
+  return toDateInputValue(date);
+}
+
+function makeWeekdayLabel(dateValue) {
+  return new Intl.DateTimeFormat("zh-CN", { weekday: "short" }).format(new Date(`${dateValue}T12:00:00`));
+}
+
+function makeDateRangeLabel(startDate, endDate) {
+  if (!startDate) return "DATES TBD";
+  const start = new Date(`${startDate}T12:00:00`);
+  const end = new Date(`${endDate || startDate}T12:00:00`);
+  const month = new Intl.DateTimeFormat("en", { month: "short" }).format(start).toUpperCase();
+  const startDay = String(start.getDate()).padStart(2, "0");
+  const endDay = String(end.getDate()).padStart(2, "0");
+  const year = end.getFullYear();
+  if (startDate === endDate) return `${startDay} ${month} ${year}`;
+  return `${startDay} - ${endDay} ${month} ${year}`;
+}
+
+function makeRouteLabels(destinations, days = []) {
+  const names = splitDestinations(destinations);
+  if (!names.length) {
+    names.push(...[...new Set(days.map(day => day.city).filter(Boolean))]);
+  }
+  if (!names.length) return ["START", "PLAN", "GO"];
+  const picks = [names[0], names[Math.floor((names.length - 1) / 2)], names[names.length - 1]];
+  return picks.map(label => String(label || "PLAN").toUpperCase().slice(0, 12));
+}
+
+function createDefaultTrip(saved = {}) {
+  const days = Array.isArray(saved.days) ? saved.days : clone(defaultDays);
+  return {
+    id: saved.id || DEFAULT_TRIP_ID,
+    name: saved.name || "Dubai · Dolomites · Venice",
+    destinations: saved.destinations || "Dubai · Dolomites · Venice",
+    startDate: saved.startDate || "2026-09-21",
+    endDate: saved.endDate || "2026-09-28",
+    dateLabel: saved.dateLabel || "21 - 28 SEP 2026",
+    heroTitle: saved.heroTitle || "从沙漠到山脊，再走进水城。",
+    routeLabels: saved.routeLabels || ["DXB", "DOLOMITES", "VCE"],
+    days,
+    fixedCosts: Array.isArray(saved.fixedCosts) ? saved.fixedCosts : clone(defaultFixedCosts),
+    budgets: Array.isArray(saved.budgets) ? saved.budgets : clone(defaultBudgets),
+    expenses: migrateExpenses(saved.expenses || defaultExpenses),
+    completed: Array.isArray(saved.completed) ? saved.completed : [],
+    saves: Array.isArray(saved.saves) ? saved.saves : clone(defaultSaves),
+    reminders: Array.isArray(saved.reminders) ? saved.reminders : clone(bookingReminders),
+    createdAt: saved.createdAt || new Date().toISOString()
+  };
+}
+
+function createTripBudgets(totalBudget) {
+  const total = Number(totalBudget || 0);
+  const splits = [
+    ["food", "食物与咖啡", "食物", 0.36, "#b79557"],
+    ["transport", "交通", "交通", 0.18, "#657f76"],
+    ["stay", "住宿", "住宿", 0.28, "#6e8d86"],
+    ["activity", "体验与门票", "体验", 0.14, "#677f9e"],
+    ["other", "其他", "其他", 0.04, "#a46d7b"]
+  ];
+  return splits.map(([id, name, shortName, ratio, color]) => ({
+    id,
+    name,
+    shortName,
+    limit: total ? Math.round(total * ratio * 100) / 100 : 0,
+    color
+  }));
+}
+
+function generateTripDays({ startDate, endDate, destinations }) {
+  const start = new Date(`${startDate}T12:00:00`);
+  const end = new Date(`${endDate || startDate}T12:00:00`);
+  const count = Number.isFinite(start.getTime()) && Number.isFinite(end.getTime())
+    ? Math.max(1, Math.min(60, Math.floor((end - start) / 86400000) + 1))
+    : 1;
+  const cities = splitDestinations(destinations);
+  const accents = ["#c86b3c", "#7d8d68", "#4c7b78", "#b28a52", "#65788a", "#a75d52", "#58748f", "#8b6a7d"];
+
+  return Array.from({ length: count }, (_, index) => {
+    const date = addDays(startDate, index);
+    const city = cities[Math.min(index, Math.max(cities.length - 1, 0))] || "待安排";
+    return {
+      id: `day-${crypto.randomUUID()}`,
+      date,
+      weekday: makeWeekdayLabel(date),
+      city,
+      country: "",
+      stay: "待安排住宿",
+      theme: "自由安排",
+      accent: accents[index % accents.length],
+      weatherKey: "custom",
+      items: []
+    };
+  });
+}
+
+function createBlankTrip(formData) {
+  const name = String(formData.get("name") || "").trim() || "新的旅程";
+  const destinations = String(formData.get("destinations") || "").trim() || "待安排目的地";
+  const startDate = String(formData.get("startDate") || getLocalDateValue());
+  const endDate = String(formData.get("endDate") || startDate);
+  const days = generateTripDays({ startDate, endDate, destinations });
+
+  return {
+    id: `trip-${crypto.randomUUID()}`,
+    name,
+    destinations,
+    startDate,
+    endDate,
+    dateLabel: makeDateRangeLabel(startDate, endDate),
+    heroTitle: String(formData.get("heroTitle") || "").trim() || "新的旅程，从这里开始。",
+    routeLabels: makeRouteLabels(destinations, days),
+    days,
+    fixedCosts: [],
+    budgets: createTripBudgets(formData.get("budget")),
+    expenses: [],
+    completed: [],
+    saves: [],
+    reminders: [],
+    createdAt: new Date().toISOString()
+  };
+}
+
+function normalizeTrip(trip) {
+  if (!trip || typeof trip !== "object") return createDefaultTrip();
+  const days = Array.isArray(trip.days) ? trip.days : [];
+  const destinations = trip.destinations || [...new Set(days.map(day => day.city).filter(Boolean))].join(" · ") || "待安排目的地";
+  const startDate = trip.startDate || days[0]?.date || "";
+  const endDate = trip.endDate || days[days.length - 1]?.date || startDate;
+
+  return {
+    id: trip.id || `trip-${crypto.randomUUID()}`,
+    name: trip.name || destinations || "未命名旅程",
+    destinations,
+    startDate,
+    endDate,
+    dateLabel: trip.dateLabel || makeDateRangeLabel(startDate, endDate),
+    heroTitle: trip.heroTitle || "新的旅程，从这里开始。",
+    routeLabels: Array.isArray(trip.routeLabels) ? trip.routeLabels : makeRouteLabels(destinations, days),
+    days,
+    fixedCosts: Array.isArray(trip.fixedCosts) ? trip.fixedCosts : [],
+    budgets: Array.isArray(trip.budgets) ? trip.budgets : createTripBudgets(0),
+    expenses: migrateExpenses(trip.expenses),
+    completed: Array.isArray(trip.completed) ? trip.completed : [],
+    saves: Array.isArray(trip.saves) ? trip.saves : [],
+    reminders: Array.isArray(trip.reminders) ? trip.reminders : [],
+    createdAt: trip.createdAt || new Date().toISOString()
+  };
+}
+
+function loadRootState() {
+  const fallbackTrip = createDefaultTrip();
   const fallback = {
     version: STATE_VERSION,
-    days: clone(defaultDays),
-    fixedCosts: clone(defaultFixedCosts),
-    budgets: clone(defaultBudgets),
-    expenses: clone(defaultExpenses),
-    completed: [],
-    saves: clone(defaultSaves)
+    activeTripId: fallbackTrip.id,
+    trips: [fallbackTrip]
   };
 
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (!saved || !Array.isArray(saved.days)) return fallback;
+    if (!saved) return fallback;
 
-    const currentBudgetIds = new Set(defaultBudgets.map(budget => budget.id));
-    const migratedExpenses = Array.isArray(saved.expenses)
-      ? saved.expenses
-          .filter(expense => expense.id !== "expense-fixed" && expense.category !== "fixed")
-          .map(expense => {
-            if (currentBudgetIds.has(expense.category)) return expense;
-            if (expense.category === "transport") return { ...expense, category: "parking" };
-            if (expense.category === "activity") return { ...expense, category: "gondola" };
-            return null;
-          })
-          .filter(Boolean)
-      : [];
+    if (Array.isArray(saved.trips)) {
+      const trips = saved.trips.map(normalizeTrip).filter(trip => trip.days);
+      if (!trips.length) return fallback;
+      const activeTripId = trips.some(trip => trip.id === saved.activeTripId) ? saved.activeTripId : trips[0].id;
+      return { version: STATE_VERSION, activeTripId, trips };
+    }
 
-    return {
-      version: STATE_VERSION,
-      days: saved.days,
-      fixedCosts: saved.version === STATE_VERSION && Array.isArray(saved.fixedCosts)
-        ? saved.fixedCosts
-        : fallback.fixedCosts,
-      budgets: saved.version === STATE_VERSION && Array.isArray(saved.budgets)
-        ? saved.budgets
-        : fallback.budgets,
-      expenses: migratedExpenses,
-      completed: Array.isArray(saved.completed) ? saved.completed : [],
-      saves: Array.isArray(saved.saves) ? saved.saves : fallback.saves
-    };
+    if (Array.isArray(saved.days)) {
+      const migratedTrip = createDefaultTrip(saved);
+      return { version: STATE_VERSION, activeTripId: migratedTrip.id, trips: [migratedTrip] };
+    }
+
+    return fallback;
   } catch {
     return fallback;
   }
@@ -87,7 +255,8 @@ function loadWeather() {
   }
 }
 
-let state = loadState();
+let rootState = loadRootState();
+let state = getActiveTrip();
 let weatherState = loadWeather();
 let activeView = location.hash.replace("#", "") || "home";
 let openDays = new Set();
@@ -105,11 +274,17 @@ const fullDateFormatter = new Intl.DateTimeFormat("zh-CN", {
 });
 
 function saveState(message = "已自动保存") {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  rootState.version = STATE_VERSION;
+  rootState.activeTripId = state.id;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(rootState));
   const syncState = $("#sync-state");
   if (syncState) {
     syncState.innerHTML = `<i></i> ${escapeHtml(message)}`;
   }
+}
+
+function getActiveTrip() {
+  return rootState.trips.find(trip => trip.id === rootState.activeTripId) || rootState.trips[0];
 }
 
 function showToast(message) {
@@ -318,6 +493,59 @@ function getLocalDateValue(date = new Date()) {
   return `${year}-${month}-${day}`;
 }
 
+function getTripDestinations() {
+  return state.destinations || [...new Set(state.days.map(day => day.city).filter(Boolean))].join(" · ") || "待安排目的地";
+}
+
+function getTripDateLabel() {
+  return state.dateLabel || makeDateRangeLabel(state.startDate || state.days[0]?.date, state.endDate || state.days[state.days.length - 1]?.date);
+}
+
+function formatHeroTitle(title) {
+  const clean = String(title || "新的旅程，从这里开始。").trim();
+  return escapeHtml(clean).replace(/，/, "，<br />");
+}
+
+function renderHero() {
+  $("#hero-date-label").textContent = getTripDateLabel();
+  $("#hero-title").innerHTML = formatHeroTitle(state.heroTitle);
+  $("#hero-destinations").innerHTML = splitDestinations(getTripDestinations())
+    .map(escapeHtml)
+    .join(" <span>·</span> ") || "待安排目的地";
+
+  const labels = Array.isArray(state.routeLabels) && state.routeLabels.length
+    ? state.routeLabels
+    : makeRouteLabels(getTripDestinations(), state.days);
+  $("#route-label-start").textContent = labels[0] || "START";
+  $("#route-label-mid").textContent = labels[1] || "PLAN";
+  $("#route-label-end").textContent = labels[2] || "GO";
+}
+
+function renderTripHub() {
+  $("#active-trip-name").textContent = state.name || "未命名旅程";
+  $("#active-trip-meta").textContent = `${getTripDateLabel()} · ${state.days.length} 天 · ${getTripDestinations()}`;
+  $("#trip-select").innerHTML = rootState.trips
+    .map(trip => `<option value="${trip.id}" ${trip.id === state.id ? "selected" : ""}>${escapeHtml(trip.name || "未命名旅程")}</option>`)
+    .join("");
+}
+
+function switchTrip(tripId) {
+  const nextTrip = rootState.trips.find(trip => trip.id === tripId);
+  if (!nextTrip || nextTrip.id === state.id) return;
+  rootState.activeTripId = nextTrip.id;
+  state = nextTrip;
+  openDays = new Set();
+  saveState("已切换旅程");
+  populateFormOptions();
+  renderHome();
+  renderItinerary();
+  renderWallet();
+  renderSaves();
+  renderWeather();
+  switchView("home");
+  showToast(`已切换到 ${state.name}`);
+}
+
 function switchView(view, updateHash = true) {
   const validView = ["home", "itinerary", "wallet", "saves", "weather"].includes(view) ? view : "home";
   activeView = validView;
@@ -333,11 +561,27 @@ function switchView(view, updateHash = true) {
 }
 
 function renderHome() {
+  renderTripHub();
+  renderHero();
+
   const next = getNextPlan();
   const countdown = getCountdown(next?.start);
   const nextCard = $("#next-card");
+  const hasPlanItems = state.days.some(day => Array.isArray(day.items) && day.items.length);
 
-  if (!next) {
+  if (!next && !hasPlanItems) {
+    nextCard.innerHTML = `
+      <div class="next-icon">${icons.next}</div>
+      <div class="next-copy">
+        <small>READY TO PLAN</small>
+        <h2>这趟旅程还没有行程</h2>
+        <p>先建立每天的日期，再把收藏或地点加入行程。</p>
+      </div>
+      <div class="next-meta">
+        <button class="primary-button" id="empty-add-plan-button" type="button">新增第一站</button>
+      </div>
+    `;
+  } else if (!next) {
     nextCard.innerHTML = `
       <div class="next-icon">${icons.next}</div>
       <div class="next-copy">
@@ -366,6 +610,7 @@ function renderHome() {
     `;
   }
 
+  $("#journey-heading").textContent = state.days.length ? `${state.days.length} 天，一条路线` : "还没有日期";
   $("#journey-strip").innerHTML = state.days
     .map(
       day => `
@@ -376,7 +621,7 @@ function renderHome() {
         </button>
       `
     )
-    .join("");
+    .join("") || '<div class="empty-state is-compact">这个旅程还没有日期。建立新旅程时选择开始和结束日期即可自动生成每天的空行程。</div>';
 
   const stats = getBudgetStats();
   const safePercent = Math.min(Math.max(stats.percent, 0), 100);
@@ -400,7 +645,8 @@ function renderHome() {
     <button class="primary-button" type="button" data-go="wallet">打开旅行钱包</button>
   `;
 
-  $("#reminder-list").innerHTML = bookingReminders
+  const reminders = Array.isArray(state.reminders) ? state.reminders : [];
+  $("#reminder-list").innerHTML = reminders.length ? reminders
     .map(
       reminder => `
         <article class="reminder">
@@ -413,7 +659,7 @@ function renderHome() {
         </article>
       `
     )
-    .join("");
+    .join("") : '<div class="empty-state is-compact">这个旅程暂时没有固定预约事项。之后可以把重要事项加入每日行程或收藏备注。</div>';
 }
 
 function getTripForecastForDay(day) {
@@ -436,6 +682,11 @@ function dayWeatherLabel(day) {
 }
 
 function renderItinerary() {
+  if (!state.days.length) {
+    $("#day-list").innerHTML = '<div class="empty-state is-compact">这个旅程还没有日期。请先新建一个带日期范围的旅程。</div>';
+    return;
+  }
+
   if (!openDays.size) {
     const next = getNextPlan();
     openDays.add(next?.day.id || state.days[0].id);
@@ -789,7 +1040,25 @@ function weatherDescription(code) {
 
 function renderWeather() {
   const next = getNextPlan();
-  const nextKey = next?.day.weatherKey || "dubai";
+  const tripWeatherKeys = [...new Set(state.days.map(day => day.weatherKey).filter(key => weatherLocations[key]))];
+
+  if (!tripWeatherKeys.length) {
+    $("#weather-hero").innerHTML = `
+      <div class="weather-hero-copy">
+        <p class="eyebrow">WEATHER WINDOW</p>
+        <h2>这个旅程还没有天气城市</h2>
+        <p>新建旅程已经可以规划行程、预算和收藏。天气需要目的地坐标，之后可以为这个旅程加入城市天气资料。</p>
+      </div>
+      <div class="weather-hero-temp">
+        <strong>--°</strong>
+        <span>等待城市天气设定</span>
+      </div>
+    `;
+    $("#weather-grid").innerHTML = '<div class="empty-state is-compact">当前旅程使用自定义目的地，暂时不显示实时天气。</div>';
+    return;
+  }
+
+  const nextKey = weatherLocations[next?.day.weatherKey] ? next.day.weatherKey : tripWeatherKeys[0];
   const nextLocation = weatherLocations[nextKey];
   const nextWeather = weatherState.locations?.[nextKey];
   const [description] = weatherDescription(nextWeather?.current?.weather_code);
@@ -807,6 +1076,7 @@ function renderWeather() {
   `;
 
   $("#weather-grid").innerHTML = Object.entries(weatherLocations)
+    .filter(([key]) => tripWeatherKeys.includes(key))
     .map(([key, locationData]) => {
       const result = weatherState.locations?.[key];
       const [currentDescription, symbol] = weatherDescription(result?.current?.weather_code);
@@ -914,9 +1184,10 @@ async function refreshWeather(force = false) {
 }
 
 function populateFormOptions() {
-  $("#plan-day-select").innerHTML = state.days
+  const dayOptions = state.days
     .map(day => `<option value="${day.id}">${dateFormatter.format(new Date(`${day.date}T12:00:00`))} · ${escapeHtml(day.city)}</option>`)
     .join("");
+  $("#plan-day-select").innerHTML = dayOptions || '<option value="">请先建立日期</option>';
   $("#expense-category").innerHTML = state.budgets
     .map(budget => `<option value="${budget.id}">${escapeHtml(budget.name)}</option>`)
     .join("");
@@ -926,7 +1197,51 @@ function populateFormOptions() {
   ].join("");
 }
 
+function openTripModal() {
+  const form = $("#trip-form");
+  const today = getLocalDateValue();
+  form.reset();
+  form.elements.startDate.value = today;
+  form.elements.endDate.value = addDays(today, 3);
+  form.elements.budget.value = "";
+  $("#trip-modal").showModal();
+  setTimeout(() => form.elements.name.focus(), 50);
+}
+
+function saveTripForm() {
+  const form = $("#trip-form");
+  const data = new FormData(form);
+  const startDate = String(data.get("startDate"));
+  const endDate = String(data.get("endDate"));
+
+  if (new Date(`${endDate}T12:00:00`) < new Date(`${startDate}T12:00:00`)) {
+    showToast("结束日期不能早于开始日期");
+    return false;
+  }
+
+  const trip = createBlankTrip(data);
+  rootState.trips.unshift(trip);
+  rootState.activeTripId = trip.id;
+  state = trip;
+  openDays = new Set();
+  saveState("新旅程已建立");
+  populateFormOptions();
+  renderHome();
+  renderItinerary();
+  renderWallet();
+  renderSaves();
+  renderWeather();
+  switchView("home");
+  showToast("新旅程已建立");
+  return true;
+}
+
 function openPlanModal(itemId = null, preferredDayId = null) {
+  if (!state.days.length) {
+    showToast("请先建立带日期的旅程");
+    return;
+  }
+
   const modal = $("#plan-modal");
   const form = $("#plan-form");
   form.reset();
@@ -1335,7 +1650,12 @@ function handleClick(event) {
     return;
   }
 
-  if (event.target.closest("#add-plan-button")) {
+  if (event.target.closest("#new-trip-button")) {
+    openTripModal();
+    return;
+  }
+
+  if (event.target.closest("#add-plan-button") || event.target.closest("#empty-add-plan-button")) {
     openPlanModal();
     return;
   }
@@ -1425,6 +1745,18 @@ function handleClick(event) {
 }
 
 function setupForms() {
+  $("#trip-select").addEventListener("change", event => switchTrip(event.target.value));
+
+  $("#trip-form").addEventListener("submit", event => {
+    event.preventDefault();
+    if (event.submitter?.value === "cancel") {
+      $("#trip-modal").close();
+      return;
+    }
+    if (!event.currentTarget.reportValidity()) return;
+    if (saveTripForm()) $("#trip-modal").close();
+  });
+
   $("#plan-form").addEventListener("submit", event => {
     event.preventDefault();
     if (event.submitter?.value === "cancel") {

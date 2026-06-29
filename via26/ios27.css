@@ -179,6 +179,32 @@ main {
   padding-bottom: calc(126px + var(--safe-bottom));
 }
 
+.trip-hub {
+  border-color: rgba(255, 255, 255, 0.74);
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(255, 255, 255, 0.84), transparent 40%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.76), rgba(249, 246, 240, 0.48)),
+    rgba(255, 255, 255, 0.46);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.94) inset,
+    0 14px 42px rgba(55, 47, 38, 0.08);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+}
+
+.trip-hub h2 {
+  letter-spacing: -0.04em;
+}
+
+.trip-select-label select {
+  border-color: rgba(255, 255, 255, 0.64);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(255, 251, 245, 0.36)),
+    rgba(255, 255, 255, 0.42);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.82) inset;
+}
+
 .view {
   animation: ios-view-in 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
