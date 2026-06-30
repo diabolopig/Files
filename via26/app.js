@@ -501,26 +501,6 @@ function getTripDateLabel() {
   return state.dateLabel || makeDateRangeLabel(state.startDate || state.days[0]?.date, state.endDate || state.days[state.days.length - 1]?.date);
 }
 
-function formatHeroTitle(title) {
-  const clean = String(title || "新的旅程，从这里开始。").trim();
-  return escapeHtml(clean).replace(/，/, "，<br />");
-}
-
-function renderHero() {
-  $("#hero-date-label").textContent = getTripDateLabel();
-  $("#hero-title").innerHTML = formatHeroTitle(state.heroTitle);
-  $("#hero-destinations").innerHTML = splitDestinations(getTripDestinations())
-    .map(escapeHtml)
-    .join(" <span>·</span> ") || "待安排目的地";
-
-  const labels = Array.isArray(state.routeLabels) && state.routeLabels.length
-    ? state.routeLabels
-    : makeRouteLabels(getTripDestinations(), state.days);
-  $("#route-label-start").textContent = labels[0] || "START";
-  $("#route-label-mid").textContent = labels[1] || "PLAN";
-  $("#route-label-end").textContent = labels[2] || "GO";
-}
-
 function renderTripHub() {
   $("#active-trip-name").textContent = state.name || "未命名旅程";
   $("#active-trip-meta").textContent = `${getTripDateLabel()} · ${state.days.length} 天 · ${getTripDestinations()}`;
@@ -562,7 +542,6 @@ function switchView(view, updateHash = true) {
 
 function renderHome() {
   renderTripHub();
-  renderHero();
 
   const next = getNextPlan();
   const countdown = getCountdown(next?.start);

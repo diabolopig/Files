@@ -230,107 +230,6 @@ main {
   outline: 0;
 }
 
-.hero {
-  position: relative;
-  display: grid;
-  overflow: hidden;
-  min-height: 360px;
-  padding: clamp(38px, 6vw, 78px);
-  border-radius: 38px;
-  color: var(--paper);
-  background: var(--ink);
-  box-shadow: 0 24px 70px rgba(23, 63, 58, 0.19);
-  grid-template-columns: 1.05fr 0.95fr;
-}
-
-.hero-scenes {
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-}
-
-.hero-scenes::after {
-  position: absolute;
-  z-index: 4;
-  inset: 0;
-  background:
-    linear-gradient(90deg, rgba(8, 35, 32, 0.95) 0%, rgba(8, 35, 32, 0.78) 43%, rgba(8, 35, 32, 0.26) 74%, rgba(8, 35, 32, 0.42) 100%),
-    linear-gradient(0deg, rgba(8, 35, 32, 0.44), transparent 48%);
-  content: "";
-}
-
-.hero-scene {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  background-position: center;
-  background-size: cover;
-  animation: hero-scene-cycle 21s infinite;
-  transform: scale(1.015);
-}
-
-.hero-scene::after {
-  position: absolute;
-  inset: 0;
-  background: rgba(18, 58, 52, 0.12);
-  content: "";
-}
-
-.scene-dubai {
-  opacity: 1;
-  background-image: var(--scene-dubai-image);
-  animation-delay: 0s;
-}
-
-.scene-dolomites {
-  background-image: var(--scene-dolomites-image);
-  animation-delay: 7s;
-}
-
-.scene-venice {
-  background-image: var(--scene-venice-image);
-  animation-delay: 14s;
-}
-
-@keyframes hero-scene-cycle {
-  0%,
-  28% {
-    opacity: 1;
-    transform: scale(1.015);
-  }
-
-  33%,
-  95% {
-    opacity: 0;
-    transform: scale(1.055);
-  }
-
-  100% {
-    opacity: 1;
-    transform: scale(1.015);
-  }
-}
-
-.hero::after {
-  position: absolute;
-  right: -120px;
-  bottom: -190px;
-  width: 460px;
-  height: 460px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 58px rgba(255, 255, 255, 0.025),
-    0 0 0 120px rgba(255, 255, 255, 0.018);
-  content: "";
-}
-
-.hero-copy {
-  position: relative;
-  z-index: 2;
-  align-self: center;
-}
-
 .eyebrow {
   margin: 0 0 12px;
   color: var(--orange);
@@ -339,123 +238,13 @@ main {
   font-weight: 700;
 }
 
-.hero .eyebrow {
-  color: #e7a278;
-}
-
-.hero h1 {
-  max-width: 610px;
-  margin: 0;
-  font-family: "Noto Serif SC", Georgia, serif;
-  font-size: clamp(40px, 5vw, 66px);
-  font-weight: 600;
-  letter-spacing: -0.045em;
-  line-height: 1.18;
-}
-
-.hero-note {
-  margin: 25px 0 0;
-  color: rgba(255, 253, 248, 0.65);
-  letter-spacing: 0.08em;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.hero-note span {
-  margin: 0 8px;
-  color: #e7a278;
-}
-
-.route-art {
-  position: relative;
-  z-index: 2;
-  align-self: center;
-  min-height: 250px;
-}
-
-.route-art svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.route-path-shadow,
-.route-path {
-  fill: none;
-  stroke-linecap: round;
-}
-
-.route-path-shadow {
-  stroke: rgba(255, 255, 255, 0.08);
-  stroke-width: 11;
-}
-
-.route-path {
-  stroke: #dda07a;
-  stroke-dasharray: 2 11;
-  stroke-width: 3;
-}
-
-.route-art circle {
-  fill: #f7e6d5;
-  stroke: var(--orange);
-  stroke-width: 5;
-}
-
-.route-label {
-  position: absolute;
-  z-index: 3;
-  color: rgba(255, 253, 248, 0.72);
-  letter-spacing: 0.16em;
-  font-size: 9px;
-  font-weight: 700;
-}
-
-.route-label-dxb {
-  bottom: 16%;
-  left: 0;
-}
-
-.route-label-dol {
-  top: 32%;
-  left: 49%;
-}
-
-.route-label-vce {
-  top: 5%;
-  right: 0;
-}
-
-.route-mountain {
-  position: absolute;
-  bottom: 8px;
-  display: block;
-  width: 0;
-  height: 0;
-  border-right: 46px solid transparent;
-  border-bottom: 96px solid rgba(255, 255, 255, 0.05);
-  border-left: 46px solid transparent;
-}
-
-.mountain-one {
-  right: 40px;
-}
-
-.mountain-two {
-  right: 100px;
-  bottom: 7px;
-  transform: scale(0.72);
-}
-
 .next-card {
   position: relative;
   z-index: 4;
   display: grid;
   width: calc(100% - clamp(30px, 7vw, 90px));
   min-height: 128px;
-  margin: -34px auto 36px;
+  margin: 18px auto 36px;
   padding: 24px 28px;
   border: 1px solid rgba(255, 255, 255, 0.72);
   border-radius: var(--radius-md);
@@ -2487,43 +2276,9 @@ main {
     min-width: 0;
   }
 
-  .hero {
-    min-height: 455px;
-    padding: 32px 25px;
-    border-radius: 28px;
-    grid-template-columns: 1fr;
-  }
-
-  .hero-scenes::after {
-    background:
-      linear-gradient(180deg, rgba(8, 35, 32, 0.48) 0%, rgba(8, 35, 32, 0.78) 58%, rgba(8, 35, 32, 0.92) 100%),
-      linear-gradient(90deg, rgba(8, 35, 32, 0.65), rgba(8, 35, 32, 0.1));
-  }
-
-  .hero-scene {
-    background-position: 62% center;
-  }
-
-  .scene-dolomites {
-    background-position: 69% center;
-  }
-
-  .scene-venice {
-    background-position: 66% center;
-  }
-
-  .hero h1 {
-    font-size: clamp(38px, 11vw, 58px);
-  }
-
-  .route-art {
-    min-height: 180px;
-    margin-top: -12px;
-  }
-
   .next-card {
     width: calc(100% - 20px);
-    margin-top: -22px;
+    margin-top: 18px;
     padding: 20px;
     grid-template-columns: auto 1fr;
     gap: 15px;
@@ -2816,14 +2571,6 @@ main {
     display: none;
   }
 
-  .hero {
-    min-height: 425px;
-  }
-
-  .hero-note {
-    letter-spacing: 0.03em;
-  }
-
   .section-heading {
     align-items: flex-start;
   }
@@ -2855,9 +2602,6 @@ main {
     animation-iteration-count: 1 !important;
   }
 
-  .hero-scene:not(.scene-dubai) {
-    opacity: 0;
-  }
 }
 
 
@@ -3079,110 +2823,10 @@ main {
   }
 }
 
-.hero {
-  min-height: clamp(430px, 58vw, 610px);
-  padding: clamp(38px, 6vw, 76px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 44px;
-  box-shadow:
-    0 32px 90px rgba(30, 42, 38, 0.2),
-    0 1px 0 rgba(255, 255, 255, 0.35) inset;
-  grid-template-columns: minmax(0, 1.08fr) minmax(310px, 0.92fr);
-}
-
-.hero-scenes::after {
-  background:
-    linear-gradient(90deg, rgba(11, 31, 28, 0.88) 0%, rgba(11, 31, 28, 0.68) 43%, rgba(11, 31, 28, 0.15) 76%, rgba(11, 31, 28, 0.34) 100%),
-    linear-gradient(0deg, rgba(8, 22, 21, 0.64), transparent 55%);
-}
-
-.hero::before {
-  position: absolute;
-  z-index: 1;
-  inset: 1px;
-  border-radius: 43px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), transparent 34%, transparent 68%, rgba(255, 255, 255, 0.08));
-  content: "";
-  pointer-events: none;
-}
-
-.hero::after {
-  right: -130px;
-  bottom: -220px;
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-.hero .eyebrow {
-  display: inline-flex;
-  min-height: 28px;
-  margin-bottom: 20px;
-  padding: 0 11px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 999px;
-  color: #ffe0ca;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  align-items: center;
-}
-
-.hero h1 {
-  max-width: 640px;
-  font-family: "Iowan Old Style", "Noto Serif SC", Georgia, serif;
-  font-size: clamp(44px, 5.5vw, 72px);
-  font-weight: 600;
-  letter-spacing: -0.055em;
-  line-height: 1.12;
-  text-wrap: balance;
-  text-shadow: 0 3px 24px rgba(0, 0, 0, 0.16);
-}
-
-.hero-note {
-  margin-top: 28px;
-  color: rgba(255, 255, 255, 0.75);
-  letter-spacing: 0.12em;
-}
-
-.route-art {
-  min-height: 300px;
-  padding: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 36px;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.035)),
-    rgba(13, 38, 35, 0.12);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.17) inset,
-    0 24px 70px rgba(8, 25, 23, 0.13);
-  backdrop-filter: blur(16px) saturate(120%);
-  -webkit-backdrop-filter: blur(16px) saturate(120%);
-}
-
-.route-art svg {
-  inset: 18px;
-  width: calc(100% - 36px);
-  height: calc(100% - 36px);
-}
-
-.route-label-dxb {
-  bottom: 18%;
-  left: 18px;
-}
-
-.route-label-dol {
-  top: 34%;
-  left: 50%;
-}
-
-.route-label-vce {
-  top: 8%;
-  right: 18px;
-}
-
 .next-card {
   width: calc(100% - clamp(34px, 7vw, 96px));
   min-height: 138px;
-  margin-top: -42px;
+  margin-top: 18px;
   padding: 22px 24px;
   border-color: var(--glass-border);
   border-radius: 29px;
@@ -4136,75 +3780,9 @@ main {
     padding-bottom: calc(118px + var(--safe-bottom));
   }
 
-  .hero {
-    min-height: 520px;
-    padding: 31px 25px 27px;
-    border-radius: 34px;
-    grid-template-columns: 1fr;
-  }
-
-  .hero::before {
-    border-radius: 33px;
-  }
-
-  .hero-scenes::after {
-    background:
-      linear-gradient(180deg, rgba(8, 24, 22, 0.25) 0%, rgba(8, 24, 22, 0.46) 39%, rgba(8, 24, 22, 0.94) 100%),
-      linear-gradient(90deg, rgba(8, 24, 22, 0.5), rgba(8, 24, 22, 0.03));
-  }
-
-  .hero-copy {
-    align-self: end;
-  }
-
-  .hero .eyebrow {
-    margin-bottom: 14px;
-  }
-
-  .hero h1 {
-    font-size: clamp(40px, 11.3vw, 55px);
-    line-height: 1.12;
-  }
-
-  .hero-note {
-    margin-top: 18px;
-    letter-spacing: 0.055em;
-    font-size: 10px;
-  }
-
-  .route-art {
-    min-height: 151px;
-    margin-top: 7px;
-    padding: 10px;
-    border-radius: 25px;
-  }
-
-  .route-art svg {
-    inset: 10px;
-    width: calc(100% - 20px);
-    height: calc(100% - 20px);
-  }
-
-  .route-label-dxb {
-    bottom: 18%;
-    left: 12px;
-  }
-
-  .route-label-dol {
-    top: 31%;
-  }
-
-  .route-label-vce {
-    right: 12px;
-  }
-
-  .route-mountain {
-    opacity: 0.6;
-  }
-
   .next-card {
     width: calc(100% - 16px);
-    margin-top: -26px;
+    margin-top: 16px;
     margin-bottom: 24px;
     padding: 18px;
     border-radius: 25px;
@@ -4479,18 +4057,6 @@ main {
     display: none;
   }
 
-  .hero {
-    min-height: 500px;
-  }
-
-  .hero h1 {
-    font-size: clamp(38px, 11.4vw, 49px);
-  }
-
-  .route-art {
-    min-height: 138px;
-  }
-
   .next-copy h2 {
     font-size: 19px;
   }
@@ -4533,8 +4099,6 @@ main {
     -webkit-backdrop-filter: none;
   }
 
-  .route-art,
-  .hero .eyebrow,
   .chevron {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
@@ -4587,33 +4151,6 @@ main {
               </button>
             </div>
           </section>
-
-          <div class="hero">
-            <div class="hero-scenes" aria-hidden="true">
-              <span class="hero-scene scene-dubai"></span>
-              <span class="hero-scene scene-dolomites"></span>
-              <span class="hero-scene scene-venice"></span>
-            </div>
-            <div class="hero-copy">
-              <p class="eyebrow" id="hero-date-label">DATES TBD</p>
-              <h1 id="hero-title">新的旅程，从这里开始。</h1>
-              <p class="hero-note" id="hero-destinations">待安排目的地</p>
-            </div>
-            <div class="route-art" aria-hidden="true">
-              <span class="route-label route-label-dxb" id="route-label-start">START</span>
-              <span class="route-label route-label-dol" id="route-label-mid">PLAN</span>
-              <span class="route-label route-label-vce" id="route-label-end">GO</span>
-              <svg viewBox="0 0 520 240" role="img">
-                <path class="route-path-shadow" d="M18 175 C122 36 202 222 289 101 C355 9 414 88 496 40" />
-                <path class="route-path" d="M18 175 C122 36 202 222 289 101 C355 9 414 88 496 40" />
-                <circle cx="18" cy="175" r="7" />
-                <circle cx="289" cy="101" r="7" />
-                <circle cx="496" cy="40" r="7" />
-              </svg>
-              <span class="route-mountain mountain-one"></span>
-              <span class="route-mountain mountain-two"></span>
-            </div>
-          </div>
 
           <section class="next-card" id="next-card"></section>
 
@@ -5597,26 +5134,6 @@ function getTripDateLabel() {
   return state.dateLabel || makeDateRangeLabel(state.startDate || state.days[0]?.date, state.endDate || state.days[state.days.length - 1]?.date);
 }
 
-function formatHeroTitle(title) {
-  const clean = String(title || "新的旅程，从这里开始。").trim();
-  return escapeHtml(clean).replace(/，/, "，<br />");
-}
-
-function renderHero() {
-  $("#hero-date-label").textContent = getTripDateLabel();
-  $("#hero-title").innerHTML = formatHeroTitle(state.heroTitle);
-  $("#hero-destinations").innerHTML = splitDestinations(getTripDestinations())
-    .map(escapeHtml)
-    .join(" <span>·</span> ") || "待安排目的地";
-
-  const labels = Array.isArray(state.routeLabels) && state.routeLabels.length
-    ? state.routeLabels
-    : makeRouteLabels(getTripDestinations(), state.days);
-  $("#route-label-start").textContent = labels[0] || "START";
-  $("#route-label-mid").textContent = labels[1] || "PLAN";
-  $("#route-label-end").textContent = labels[2] || "GO";
-}
-
 function renderTripHub() {
   $("#active-trip-name").textContent = state.name || "未命名旅程";
   $("#active-trip-meta").textContent = `${getTripDateLabel()} · ${state.days.length} 天 · ${getTripDestinations()}`;
@@ -5658,7 +5175,6 @@ function switchView(view, updateHash = true) {
 
 function renderHome() {
   renderTripHub();
-  renderHero();
 
   const next = getNextPlan();
   const countdown = getCountdown(next?.start);

@@ -218,107 +218,6 @@ main {
   outline: 0;
 }
 
-.hero {
-  position: relative;
-  display: grid;
-  overflow: hidden;
-  min-height: 360px;
-  padding: clamp(38px, 6vw, 78px);
-  border-radius: 38px;
-  color: var(--paper);
-  background: var(--ink);
-  box-shadow: 0 24px 70px rgba(23, 63, 58, 0.19);
-  grid-template-columns: 1.05fr 0.95fr;
-}
-
-.hero-scenes {
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-}
-
-.hero-scenes::after {
-  position: absolute;
-  z-index: 4;
-  inset: 0;
-  background:
-    linear-gradient(90deg, rgba(8, 35, 32, 0.95) 0%, rgba(8, 35, 32, 0.78) 43%, rgba(8, 35, 32, 0.26) 74%, rgba(8, 35, 32, 0.42) 100%),
-    linear-gradient(0deg, rgba(8, 35, 32, 0.44), transparent 48%);
-  content: "";
-}
-
-.hero-scene {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  background-position: center;
-  background-size: cover;
-  animation: hero-scene-cycle 21s infinite;
-  transform: scale(1.015);
-}
-
-.hero-scene::after {
-  position: absolute;
-  inset: 0;
-  background: rgba(18, 58, 52, 0.12);
-  content: "";
-}
-
-.scene-dubai {
-  opacity: 1;
-  background-image: var(--scene-dubai-image);
-  animation-delay: 0s;
-}
-
-.scene-dolomites {
-  background-image: var(--scene-dolomites-image);
-  animation-delay: 7s;
-}
-
-.scene-venice {
-  background-image: var(--scene-venice-image);
-  animation-delay: 14s;
-}
-
-@keyframes hero-scene-cycle {
-  0%,
-  28% {
-    opacity: 1;
-    transform: scale(1.015);
-  }
-
-  33%,
-  95% {
-    opacity: 0;
-    transform: scale(1.055);
-  }
-
-  100% {
-    opacity: 1;
-    transform: scale(1.015);
-  }
-}
-
-.hero::after {
-  position: absolute;
-  right: -120px;
-  bottom: -190px;
-  width: 460px;
-  height: 460px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 58px rgba(255, 255, 255, 0.025),
-    0 0 0 120px rgba(255, 255, 255, 0.018);
-  content: "";
-}
-
-.hero-copy {
-  position: relative;
-  z-index: 2;
-  align-self: center;
-}
-
 .eyebrow {
   margin: 0 0 12px;
   color: var(--orange);
@@ -327,123 +226,13 @@ main {
   font-weight: 700;
 }
 
-.hero .eyebrow {
-  color: #e7a278;
-}
-
-.hero h1 {
-  max-width: 610px;
-  margin: 0;
-  font-family: "Noto Serif SC", Georgia, serif;
-  font-size: clamp(40px, 5vw, 66px);
-  font-weight: 600;
-  letter-spacing: -0.045em;
-  line-height: 1.18;
-}
-
-.hero-note {
-  margin: 25px 0 0;
-  color: rgba(255, 253, 248, 0.65);
-  letter-spacing: 0.08em;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.hero-note span {
-  margin: 0 8px;
-  color: #e7a278;
-}
-
-.route-art {
-  position: relative;
-  z-index: 2;
-  align-self: center;
-  min-height: 250px;
-}
-
-.route-art svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.route-path-shadow,
-.route-path {
-  fill: none;
-  stroke-linecap: round;
-}
-
-.route-path-shadow {
-  stroke: rgba(255, 255, 255, 0.08);
-  stroke-width: 11;
-}
-
-.route-path {
-  stroke: #dda07a;
-  stroke-dasharray: 2 11;
-  stroke-width: 3;
-}
-
-.route-art circle {
-  fill: #f7e6d5;
-  stroke: var(--orange);
-  stroke-width: 5;
-}
-
-.route-label {
-  position: absolute;
-  z-index: 3;
-  color: rgba(255, 253, 248, 0.72);
-  letter-spacing: 0.16em;
-  font-size: 9px;
-  font-weight: 700;
-}
-
-.route-label-dxb {
-  bottom: 16%;
-  left: 0;
-}
-
-.route-label-dol {
-  top: 32%;
-  left: 49%;
-}
-
-.route-label-vce {
-  top: 5%;
-  right: 0;
-}
-
-.route-mountain {
-  position: absolute;
-  bottom: 8px;
-  display: block;
-  width: 0;
-  height: 0;
-  border-right: 46px solid transparent;
-  border-bottom: 96px solid rgba(255, 255, 255, 0.05);
-  border-left: 46px solid transparent;
-}
-
-.mountain-one {
-  right: 40px;
-}
-
-.mountain-two {
-  right: 100px;
-  bottom: 7px;
-  transform: scale(0.72);
-}
-
 .next-card {
   position: relative;
   z-index: 4;
   display: grid;
   width: calc(100% - clamp(30px, 7vw, 90px));
   min-height: 128px;
-  margin: -34px auto 36px;
+  margin: 18px auto 36px;
   padding: 24px 28px;
   border: 1px solid rgba(255, 255, 255, 0.72);
   border-radius: var(--radius-md);
@@ -2475,43 +2264,9 @@ main {
     min-width: 0;
   }
 
-  .hero {
-    min-height: 455px;
-    padding: 32px 25px;
-    border-radius: 28px;
-    grid-template-columns: 1fr;
-  }
-
-  .hero-scenes::after {
-    background:
-      linear-gradient(180deg, rgba(8, 35, 32, 0.48) 0%, rgba(8, 35, 32, 0.78) 58%, rgba(8, 35, 32, 0.92) 100%),
-      linear-gradient(90deg, rgba(8, 35, 32, 0.65), rgba(8, 35, 32, 0.1));
-  }
-
-  .hero-scene {
-    background-position: 62% center;
-  }
-
-  .scene-dolomites {
-    background-position: 69% center;
-  }
-
-  .scene-venice {
-    background-position: 66% center;
-  }
-
-  .hero h1 {
-    font-size: clamp(38px, 11vw, 58px);
-  }
-
-  .route-art {
-    min-height: 180px;
-    margin-top: -12px;
-  }
-
   .next-card {
     width: calc(100% - 20px);
-    margin-top: -22px;
+    margin-top: 18px;
     padding: 20px;
     grid-template-columns: auto 1fr;
     gap: 15px;
@@ -2804,14 +2559,6 @@ main {
     display: none;
   }
 
-  .hero {
-    min-height: 425px;
-  }
-
-  .hero-note {
-    letter-spacing: 0.03em;
-  }
-
   .section-heading {
     align-items: flex-start;
   }
@@ -2843,7 +2590,4 @@ main {
     animation-iteration-count: 1 !important;
   }
 
-  .hero-scene:not(.scene-dubai) {
-    opacity: 0;
-  }
 }
