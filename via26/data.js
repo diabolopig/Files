@@ -72,6 +72,7 @@ export const defaultDays = [
     date: "2026-09-24",
     weekday: "周四",
     city: "Bressanone",
+    displayName: "Funes + Alpe di Siusi",
     country: "Italy",
     stay: "Gerharts Premium City Living",
     theme: "Val di Funes 与 Alpe di Siusi 日落",
@@ -94,6 +95,7 @@ export const defaultDays = [
     date: "2026-09-25",
     weekday: "周五",
     city: "Bressanone",
+    displayName: "Seceda + Ortisei",
     country: "Italy",
     stay: "Gerharts Premium City Living",
     theme: "Seceda 山脊与 Bressanone 老城",
@@ -207,7 +209,7 @@ export const weatherLocations = {
   dubai: { name: "Dubai", label: "迪拜", latitude: 25.2048, longitude: 55.2708, timezone: "Asia/Dubai", typical: "28-38°C", note: "炎热干燥，室内冷气较强" },
   cortina: { name: "Cortina d'Ampezzo", label: "Cortina", latitude: 46.5405, longitude: 12.1357, timezone: "Europe/Rome", typical: "6-18°C", note: "早晚偏冷，山口风大" },
   misurina: { name: "Misurina", label: "Misurina", latitude: 46.5824, longitude: 12.2541, timezone: "Europe/Rome", typical: "3-15°C", note: "高山温差大，日落后迅速降温" },
-  bressanone: { name: "Bressanone", label: "Bressanone", latitude: 46.7167, longitude: 11.65, timezone: "Europe/Rome", typical: "9-21°C", note: "市区温和，Seceda 与草甸明显更冷" },
+  bressanone: { name: "Bressanone area", label: "Funes / Seceda", latitude: 46.7167, longitude: 11.65, timezone: "Europe/Rome", typical: "9-21°C", note: "西侧 Dolomites 区域，Seceda 与草甸会更冷" },
   venice: { name: "Venice", label: "Venice", latitude: 45.4408, longitude: 12.3155, timezone: "Europe/Rome", typical: "15-24°C", note: "可能阵雨，巷道与水岸湿滑" }
 };
 

@@ -20,9 +20,28 @@
   --radius-md: 22px;
   --radius-sm: 14px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --photo-rgb: 76, 112, 104;
+  --photo-soft-rgb: 160, 176, 168;
+  --photo-deep-rgb: 36, 54, 50;
   --scene-dubai-image: url("./assets/dubai-city-desert.jpg");
   --scene-dolomites-image: url("./assets/dolomites-meadow.jpg");
   --scene-venice-image: url("./assets/venice-gondola.jpg");
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #f3eee5;
+  --ink-2: #d8d0c3;
+  --paper: #0e1211;
+  --paper-deep: #151b19;
+  --card: rgba(22, 27, 25, 0.88);
+  --white: #171d1b;
+  --muted: #a8a199;
+  --line: rgba(255, 255, 255, 0.12);
+  --orange: #e19a6e;
+  --orange-dark: #f0b184;
+  --shadow: 0 18px 60px rgba(0, 0, 0, 0.34);
+  --shadow-soft: 0 8px 34px rgba(0, 0, 0, 0.24);
 }
 
 * {
@@ -40,11 +59,18 @@ body {
   overflow-x: hidden;
   color: var(--ink);
   background:
-    radial-gradient(circle at 8% 4%, rgba(212, 119, 69, 0.08), transparent 28rem),
-    radial-gradient(circle at 92% 12%, rgba(103, 127, 158, 0.08), transparent 26rem),
+    radial-gradient(circle at 12% -4%, rgba(var(--photo-rgb), 0.2), transparent 30rem),
+    radial-gradient(circle at 88% 8%, rgba(var(--photo-soft-rgb), 0.22), transparent 28rem),
     var(--paper);
   font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+:root[data-theme="dark"] body {
+  background:
+    radial-gradient(circle at 10% -6%, rgba(var(--photo-rgb), 0.34), transparent 31rem),
+    radial-gradient(circle at 88% 4%, rgba(var(--photo-deep-rgb), 0.72), transparent 30rem),
+    linear-gradient(145deg, #090d0c 0%, #111716 55%, #0c1110 100%);
 }
 
 button,
@@ -69,6 +95,61 @@ svg {
 
 .app-shell {
   min-height: 100vh;
+}
+
+.floating-controls {
+  position: fixed;
+  z-index: 90;
+  top: max(14px, calc(10px + env(safe-area-inset-top, 0px)));
+  right: max(14px, calc(14px + env(safe-area-inset-right, 0px)));
+  display: flex;
+  gap: 10px;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.46);
+  border-radius: 999px;
+  color: var(--ink);
+  background: rgba(255, 253, 248, 0.68);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  cursor: pointer;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.theme-icon {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.theme-icon-sun {
+  display: none;
+}
+
+:root[data-theme="dark"] .theme-toggle {
+  border-color: rgba(255, 255, 255, 0.16);
+  color: #f8efe4;
+  background: rgba(18, 23, 22, 0.76);
+}
+
+:root[data-theme="dark"] .theme-icon-moon {
+  display: none;
+}
+
+:root[data-theme="dark"] .theme-icon-sun {
+  display: block;
 }
 
 .topbar {
@@ -179,6 +260,109 @@ main {
   align-items: center;
 }
 
+.trip-profile {
+  display: block;
+  overflow: hidden;
+  padding: 0;
+  border-radius: 32px;
+  background:
+    linear-gradient(180deg, rgba(255, 253, 248, 0.72), rgba(255, 253, 248, 0.92)),
+    rgba(var(--photo-soft-rgb), 0.28);
+}
+
+.trip-cover {
+  position: relative;
+  overflow: hidden;
+  min-height: clamp(220px, 30vw, 340px);
+  background: rgba(var(--photo-rgb), 0.32);
+}
+
+.trip-cover img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.trip-cover-gradient {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(var(--photo-deep-rgb), 0.04) 0%, rgba(var(--photo-deep-rgb), 0.16) 50%, var(--paper) 100%),
+    linear-gradient(90deg, rgba(var(--photo-deep-rgb), 0.42), rgba(var(--photo-deep-rgb), 0.02) 58%);
+  pointer-events: none;
+}
+
+.trip-cover-actions {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.cover-action {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 999px;
+  color: #fffaf3;
+  background: rgba(14, 18, 17, 0.48);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.trip-profile-body {
+  position: relative;
+  display: grid;
+  padding: 0 22px 24px;
+  transform: translateY(-42px);
+  margin-bottom: -42px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 18px;
+}
+
+.trip-avatar {
+  position: relative;
+  display: grid;
+  overflow: hidden;
+  width: 112px;
+  height: 112px;
+  border: 5px solid var(--paper);
+  border-radius: 32px;
+  color: #fffaf3;
+  background:
+    radial-gradient(circle at 28% 15%, rgba(255, 255, 255, 0.28), transparent 38%),
+    linear-gradient(145deg, rgba(var(--photo-rgb), 0.95), rgba(var(--photo-deep-rgb), 0.95));
+  box-shadow: 0 18px 34px rgba(18, 28, 26, 0.18);
+  place-items: center;
+}
+
+.trip-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.trip-avatar span {
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-size: 44px;
+  font-weight: 700;
+}
+
+.trip-profile-copy {
+  min-width: 0;
+  padding-bottom: 8px;
+}
+
 .trip-hub h2 {
   margin: 0 0 6px;
   font-family: "Noto Serif SC", Georgia, serif;
@@ -216,6 +400,55 @@ main {
   color: var(--ink);
   background: var(--white);
   outline: 0;
+}
+
+:root[data-theme="dark"] .trip-profile {
+  background:
+    linear-gradient(180deg, rgba(16, 21, 20, 0.72), rgba(16, 21, 20, 0.92)),
+    rgba(var(--photo-deep-rgb), 0.42);
+}
+
+:root[data-theme="dark"] .trip-cover-gradient {
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.22) 48%, var(--paper) 100%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.52), rgba(0, 0, 0, 0.04) 58%);
+}
+
+:root[data-theme="dark"] .trip-avatar {
+  border-color: var(--paper);
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.34);
+}
+
+:root[data-theme="dark"] .panel,
+:root[data-theme="dark"] .next-card,
+:root[data-theme="dark"] .day-card,
+:root[data-theme="dark"] .weather-card,
+:root[data-theme="dark"] .budget-category,
+:root[data-theme="dark"] .expense-section,
+:root[data-theme="dark"] .save-card,
+:root[data-theme="dark"] .quick-save-form {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(18, 24, 23, 0.76);
+  box-shadow: var(--shadow-soft);
+}
+
+:root[data-theme="dark"] input,
+:root[data-theme="dark"] select,
+:root[data-theme="dark"] textarea,
+:root[data-theme="dark"] .quick-amount-field,
+:root[data-theme="dark"] .amount-field {
+  color: var(--ink);
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+:root[data-theme="dark"] .empty-state.is-compact,
+:root[data-theme="dark"] .journey-day,
+:root[data-theme="dark"] .fixed-cost-row,
+:root[data-theme="dark"] .quick-save-form input,
+:root[data-theme="dark"] .quick-save-controls select {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .eyebrow {
@@ -2206,6 +2439,14 @@ main {
     min-width: 0;
   }
 
+  .trip-profile-body {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .trip-profile-body .trip-hub-actions {
+    grid-column: 1 / -1;
+  }
+
   .overview-grid {
     grid-template-columns: 1fr;
   }
@@ -2253,6 +2494,29 @@ main {
   .trip-hub {
     padding: 18px;
     border-radius: 25px;
+  }
+
+  .trip-profile {
+    padding: 0;
+  }
+
+  .trip-cover {
+    min-height: 210px;
+  }
+
+  .trip-profile-body {
+    padding: 0 16px 20px;
+    gap: 13px;
+  }
+
+  .trip-avatar {
+    width: 88px;
+    height: 88px;
+    border-radius: 26px;
+  }
+
+  .trip-avatar span {
+    font-size: 36px;
   }
 
   .trip-hub-actions {

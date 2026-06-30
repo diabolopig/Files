@@ -12,6 +12,11 @@ const STORAGE_KEY = "via26-state-v1";
 const STATE_VERSION = 3;
 const DEFAULT_TRIP_ID = "trip-dubai-dolomites-venice-2026";
 const WEATHER_KEY = "via26-weather-v1";
+const THEME_KEY = "via26-theme-v1";
+const DEFAULT_DAY_DISPLAY_NAMES = {
+  "day-4": "Funes + Alpe di Siusi",
+  "day-5": "Seceda + Ortisei"
+};
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
 
@@ -96,8 +101,42 @@ function makeRouteLabels(destinations, days = []) {
   return picks.map(label => String(label || "PLAN").toUpperCase().slice(0, 12));
 }
 
+function getDayDisplayName(day) {
+  return day?.displayName || day?.city || "待安排";
+}
+
+function normalizeDay(day) {
+  if (!day || typeof day !== "object") return day;
+  return {
+    ...day,
+    displayName: day.displayName || DEFAULT_DAY_DISPLAY_NAMES[day.id] || day.city || "待安排"
+  };
+}
+
+function parseDayNames(value) {
+  return String(value || "")
+    .split(/\n+/)
+    .map(item => item.trim())
+    .filter(Boolean);
+}
+
+function applyDayDisplayNames(days, names) {
+  if (!names.length) return days;
+  return days.map((day, index) => ({
+    ...day,
+    displayName: names[index] || day.displayName || day.city
+  }));
+}
+
+function getDefaultCoverImage(destinations = "") {
+  const value = String(destinations).toLowerCase();
+  if (value.includes("dubai") || value.includes("迪拜")) return "./assets/dubai-city-desert.jpg";
+  if (value.includes("venice") || value.includes("venezia") || value.includes("威尼斯")) return "./assets/venice-gondola.jpg";
+  return "./assets/dolomites-meadow.jpg";
+}
+
 function createDefaultTrip(saved = {}) {
-  const days = Array.isArray(saved.days) ? saved.days : clone(defaultDays);
+  const days = (Array.isArray(saved.days) ? saved.days : clone(defaultDays)).map(normalizeDay);
   return {
     id: saved.id || DEFAULT_TRIP_ID,
     name: saved.name || "Dubai · Dolomites · Venice",
@@ -107,6 +146,8 @@ function createDefaultTrip(saved = {}) {
     dateLabel: saved.dateLabel || "21 - 28 SEP 2026",
     heroTitle: saved.heroTitle || "从沙漠到山脊，再走进水城。",
     routeLabels: saved.routeLabels || ["DXB", "DOLOMITES", "VCE"],
+    coverImage: saved.coverImage || getDefaultCoverImage(saved.destinations || "Dubai · Dolomites · Venice"),
+    avatarImage: saved.avatarImage || "",
     days,
     fixedCosts: Array.isArray(saved.fixedCosts) ? saved.fixedCosts : clone(defaultFixedCosts),
     budgets: Array.isArray(saved.budgets) ? saved.budgets : clone(defaultBudgets),
@@ -153,6 +194,7 @@ function generateTripDays({ startDate, endDate, destinations }) {
       date,
       weekday: makeWeekdayLabel(date),
       city,
+      displayName: city,
       country: "",
       stay: "待安排住宿",
       theme: "自由安排",
@@ -168,7 +210,10 @@ function createBlankTrip(formData) {
   const destinations = String(formData.get("destinations") || "").trim() || "待安排目的地";
   const startDate = String(formData.get("startDate") || getLocalDateValue());
   const endDate = String(formData.get("endDate") || startDate);
-  const days = generateTripDays({ startDate, endDate, destinations });
+  const days = applyDayDisplayNames(
+    generateTripDays({ startDate, endDate, destinations }),
+    parseDayNames(formData.get("dayNames"))
+  );
 
   return {
     id: `trip-${crypto.randomUUID()}`,
@@ -179,6 +224,8 @@ function createBlankTrip(formData) {
     dateLabel: makeDateRangeLabel(startDate, endDate),
     heroTitle: String(formData.get("heroTitle") || "").trim() || "新的旅程，从这里开始。",
     routeLabels: makeRouteLabels(destinations, days),
+    coverImage: getDefaultCoverImage(destinations),
+    avatarImage: "",
     days,
     fixedCosts: [],
     budgets: createTripBudgets(formData.get("budget")),
@@ -192,7 +239,7 @@ function createBlankTrip(formData) {
 
 function normalizeTrip(trip) {
   if (!trip || typeof trip !== "object") return createDefaultTrip();
-  const days = Array.isArray(trip.days) ? trip.days : [];
+  const days = Array.isArray(trip.days) ? trip.days.map(normalizeDay) : [];
   const destinations = trip.destinations || [...new Set(days.map(day => day.city).filter(Boolean))].join(" · ") || "待安排目的地";
   const startDate = trip.startDate || days[0]?.date || "";
   const endDate = trip.endDate || days[days.length - 1]?.date || startDate;
@@ -206,6 +253,8 @@ function normalizeTrip(trip) {
     dateLabel: trip.dateLabel || makeDateRangeLabel(startDate, endDate),
     heroTitle: trip.heroTitle || "新的旅程，从这里开始。",
     routeLabels: Array.isArray(trip.routeLabels) ? trip.routeLabels : makeRouteLabels(destinations, days),
+    coverImage: trip.coverImage || getDefaultCoverImage(destinations),
+    avatarImage: trip.avatarImage || "",
     days,
     fixedCosts: Array.isArray(trip.fixedCosts) ? trip.fixedCosts : [],
     budgets: Array.isArray(trip.budgets) ? trip.budgets : createTripBudgets(0),
@@ -255,9 +304,16 @@ function loadWeather() {
   }
 }
 
+function loadTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  if (saved === "dark" || saved === "light") return saved;
+  return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
 let rootState = loadRootState();
 let state = getActiveTrip();
 let weatherState = loadWeather();
+let activeTheme = loadTheme();
 let activeView = location.hash.replace("#", "") || "home";
 let openDays = new Set();
 let deferredInstallPrompt = null;
@@ -285,6 +341,93 @@ function saveState(message = "已自动保存") {
 
 function getActiveTrip() {
   return rootState.trips.find(trip => trip.id === rootState.activeTripId) || rootState.trips[0];
+}
+
+function applyTheme(theme) {
+  activeTheme = theme === "dark" ? "dark" : "light";
+  document.documentElement.dataset.theme = activeTheme;
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", activeTheme === "dark" ? "#0e1211" : "#f3efe8");
+  localStorage.setItem(THEME_KEY, activeTheme);
+
+  const toggle = $("#theme-toggle");
+  const label = $("#theme-toggle-label");
+  if (toggle) toggle.setAttribute("aria-pressed", String(activeTheme === "dark"));
+  if (label) label.textContent = activeTheme === "dark" ? "日间" : "夜间";
+}
+
+function toggleTheme() {
+  applyTheme(activeTheme === "dark" ? "light" : "dark");
+  showToast(activeTheme === "dark" ? "已切换暗黑模式" : "已切换日间模式");
+}
+
+function imageToAverageColor(src) {
+  return new Promise(resolve => {
+    const image = new Image();
+    image.onload = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        const size = 24;
+        canvas.width = size;
+        canvas.height = size;
+        const context = canvas.getContext("2d", { willReadFrequently: true });
+        context.drawImage(image, 0, 0, size, size);
+        const pixels = context.getImageData(0, 0, size, size).data;
+        let r = 0;
+        let g = 0;
+        let b = 0;
+        let count = 0;
+
+        for (let index = 0; index < pixels.length; index += 16) {
+          const alpha = pixels[index + 3];
+          if (alpha < 80) continue;
+          r += pixels[index];
+          g += pixels[index + 1];
+          b += pixels[index + 2];
+          count += 1;
+        }
+
+        if (!count) {
+          resolve(null);
+          return;
+        }
+
+        resolve({
+          r: Math.round(r / count),
+          g: Math.round(g / count),
+          b: Math.round(b / count)
+        });
+      } catch {
+        resolve(null);
+      }
+    };
+    image.onerror = () => resolve(null);
+    image.src = src;
+  });
+}
+
+function applyPhotoColor(color) {
+  const fallback = color || { r: 76, g: 112, b: 104 };
+  const darken = factor => ({
+    r: Math.max(0, Math.round(fallback.r * factor)),
+    g: Math.max(0, Math.round(fallback.g * factor)),
+    b: Math.max(0, Math.round(fallback.b * factor))
+  });
+  const soften = {
+    r: Math.min(255, Math.round((fallback.r + 244) / 2)),
+    g: Math.min(255, Math.round((fallback.g + 240) / 2)),
+    b: Math.min(255, Math.round((fallback.b + 231) / 2))
+  };
+  const deep = darken(0.48);
+  document.documentElement.style.setProperty("--photo-rgb", `${fallback.r}, ${fallback.g}, ${fallback.b}`);
+  document.documentElement.style.setProperty("--photo-soft-rgb", `${soften.r}, ${soften.g}, ${soften.b}`);
+  document.documentElement.style.setProperty("--photo-deep-rgb", `${deep.r}, ${deep.g}, ${deep.b}`);
+}
+
+async function applyTripPhotoTheme() {
+  const tripId = state.id;
+  const color = await imageToAverageColor(state.coverImage || getDefaultCoverImage(state.destinations));
+  if (state.id !== tripId) return;
+  applyPhotoColor(color);
 }
 
 function showToast(message) {
@@ -432,7 +575,7 @@ function getSaveSourceLabel(source) {
 function getSaveDayLabel(dayId) {
   const day = state.days.find(entry => entry.id === dayId);
   if (!day) return "未安排日期";
-  return `${dateFormatter.format(new Date(`${day.date}T12:00:00`))} · ${day.city}`;
+  return `${dateFormatter.format(new Date(`${day.date}T12:00:00`))} · ${getDayDisplayName(day)}`;
 }
 
 function createSaveRecord({ title, url, source, note, dayId }) {
@@ -502,11 +645,24 @@ function getTripDateLabel() {
 }
 
 function renderTripHub() {
+  const coverImage = state.coverImage || getDefaultCoverImage(state.destinations);
+  const avatarImage = state.avatarImage || "";
+  const avatarFallback = $("#trip-avatar-fallback");
+  const avatarElement = $("#trip-avatar-image");
+
+  $("#trip-cover-image").src = coverImage;
+  avatarElement.src = avatarImage;
+  avatarElement.hidden = !avatarImage;
+  if (avatarFallback) {
+    avatarFallback.textContent = String(state.name || "旅").trim().slice(0, 1).toUpperCase() || "旅";
+    avatarFallback.hidden = Boolean(avatarImage);
+  }
   $("#active-trip-name").textContent = state.name || "未命名旅程";
   $("#active-trip-meta").textContent = `${getTripDateLabel()} · ${state.days.length} 天 · ${getTripDestinations()}`;
   $("#trip-select").innerHTML = rootState.trips
     .map(trip => `<option value="${trip.id}" ${trip.id === state.id ? "selected" : ""}>${escapeHtml(trip.name || "未命名旅程")}</option>`)
     .join("");
+  applyTripPhotoTheme();
 }
 
 function switchTrip(tripId) {
@@ -575,7 +731,7 @@ function renderHome() {
       <div class="next-copy">
         <small>NEXT ON THE JOURNEY · ${escapeHtml(next.day.weekday)} ${escapeHtml(next.item.time)}</small>
         <h2>${escapeHtml(next.item.title)}</h2>
-        <p>${escapeHtml(next.item.location)} · ${escapeHtml(next.day.city)}</p>
+        <p>${escapeHtml(next.item.location)} · ${escapeHtml(getDayDisplayName(next.day))}</p>
       </div>
       <div class="next-meta">
         <div class="countdown">
@@ -595,7 +751,7 @@ function renderHome() {
       day => `
         <button class="journey-day" type="button" data-open-day="${day.id}" style="--day-accent:${day.accent}">
           <strong>${getDayNumber(day.date)}</strong>
-          <span>${escapeHtml(day.city)}</span>
+          <span>${escapeHtml(getDayDisplayName(day))}</span>
           <small>${escapeHtml(day.weekday)}</small>
         </button>
       `
@@ -683,7 +839,7 @@ function renderItinerary() {
               <small>${getDayMonth(day.date)}</small>
             </span>
             <span class="day-title">
-              <strong>${escapeHtml(day.city)}</strong>
+              <strong>${escapeHtml(getDayDisplayName(day))}</strong>
               <span>${escapeHtml(day.weekday)} · ${escapeHtml(day.theme)}</span>
             </span>
             <span class="day-summary-meta">
@@ -917,7 +1073,7 @@ function renderWallet() {
 
 function renderSaves() {
   const dayOptions = state.days
-    .map(day => `<option value="${day.id}">${getDayNumber(day.date)}日 · ${escapeHtml(day.city)}</option>`)
+    .map(day => `<option value="${day.id}">${getDayNumber(day.date)}日 · ${escapeHtml(getDayDisplayName(day))}</option>`)
     .join("");
   const saveRows = [...state.saves]
     .sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")))
@@ -1164,7 +1320,7 @@ async function refreshWeather(force = false) {
 
 function populateFormOptions() {
   const dayOptions = state.days
-    .map(day => `<option value="${day.id}">${dateFormatter.format(new Date(`${day.date}T12:00:00`))} · ${escapeHtml(day.city)}</option>`)
+    .map(day => `<option value="${day.id}">${dateFormatter.format(new Date(`${day.date}T12:00:00`))} · ${escapeHtml(getDayDisplayName(day))}</option>`)
     .join("");
   $("#plan-day-select").innerHTML = dayOptions || '<option value="">请先建立日期</option>';
   $("#expense-category").innerHTML = state.budgets
@@ -1172,30 +1328,148 @@ function populateFormOptions() {
     .join("");
   $("#save-day-select").innerHTML = [
     '<option value="">先不安排日期</option>',
-    ...state.days.map(day => `<option value="${day.id}">${dateFormatter.format(new Date(`${day.date}T12:00:00`))} · ${escapeHtml(day.city)}</option>`)
+    ...state.days.map(day => `<option value="${day.id}">${dateFormatter.format(new Date(`${day.date}T12:00:00`))} · ${escapeHtml(getDayDisplayName(day))}</option>`)
   ].join("");
 }
 
-function openTripModal() {
+function openTripModal(mode = "new") {
   const form = $("#trip-form");
   const today = getLocalDateValue();
   form.reset();
-  form.elements.startDate.value = today;
-  form.elements.endDate.value = addDays(today, 3);
-  form.elements.budget.value = "";
+  form.elements.tripId.value = "";
+  form.elements.budget.disabled = false;
+  $("#trip-budget-label").hidden = false;
+
+  if (mode === "edit") {
+    form.elements.tripId.value = state.id;
+    form.elements.name.value = state.name || "";
+    form.elements.destinations.value = state.destinations || getTripDestinations();
+    form.elements.startDate.value = state.startDate || state.days[0]?.date || today;
+    form.elements.endDate.value = state.endDate || state.days[state.days.length - 1]?.date || form.elements.startDate.value;
+    form.elements.dayNames.value = state.days.map(getDayDisplayName).join("\n");
+    form.elements.budget.disabled = true;
+    $("#trip-budget-label").hidden = true;
+    $("#trip-modal-eyebrow").textContent = "TRIP PROFILE";
+    $("#trip-modal-title").textContent = "编辑旅程资料";
+    $("#trip-submit-button").textContent = "保存资料";
+  } else {
+    form.elements.startDate.value = today;
+    form.elements.endDate.value = addDays(today, 3);
+    form.elements.budget.value = "";
+    $("#trip-modal-eyebrow").textContent = "NEW TRIP";
+    $("#trip-modal-title").textContent = "建立新的旅程";
+    $("#trip-submit-button").textContent = "建立旅程";
+  }
+
   $("#trip-modal").showModal();
   setTimeout(() => form.elements.name.focus(), 50);
+}
+
+function syncTripDateRange(trip, startDate, requestedEndDate) {
+  const requestedCount = Math.max(
+    1,
+    Math.floor((new Date(`${requestedEndDate}T12:00:00`) - new Date(`${startDate}T12:00:00`)) / 86400000) + 1
+  );
+  const cities = splitDestinations(trip.destinations);
+
+  while (trip.days.length < requestedCount) {
+    const index = trip.days.length;
+    const date = addDays(startDate, index);
+    const city = cities[Math.min(index, Math.max(cities.length - 1, 0))] || "待安排";
+    trip.days.push({
+      id: `day-${crypto.randomUUID()}`,
+      date,
+      weekday: makeWeekdayLabel(date),
+      city,
+      displayName: city,
+      country: "",
+      stay: "待安排住宿",
+      theme: "自由安排",
+      accent: ["#c86b3c", "#7d8d68", "#4c7b78", "#b28a52", "#65788a", "#a75d52", "#58748f", "#8b6a7d"][index % 8],
+      weatherKey: "custom",
+      items: []
+    });
+  }
+
+  trip.days = trip.days.map((day, index) => {
+    const date = addDays(startDate, index);
+    return {
+      ...day,
+      date,
+      weekday: makeWeekdayLabel(date)
+    };
+  });
+  trip.startDate = startDate;
+  trip.endDate = addDays(startDate, trip.days.length - 1);
+  trip.dateLabel = makeDateRangeLabel(trip.startDate, trip.endDate);
+}
+
+function readImageFile(file, maxSize = 1600) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const image = new Image();
+      image.onload = () => {
+        const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
+        const width = Math.max(1, Math.round(image.width * scale));
+        const height = Math.max(1, Math.round(image.height * scale));
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const context = canvas.getContext("2d");
+        context.drawImage(image, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", 0.86));
+      };
+      image.onerror = reject;
+      image.src = String(reader.result || "");
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function updateTripImage(kind, file) {
+  if (!file) return;
+  try {
+    const image = await readImageFile(file, kind === "avatar" ? 720 : 1800);
+    if (!image) return;
+    if (kind === "cover") state.coverImage = image;
+    if (kind === "avatar") state.avatarImage = image;
+    saveState(kind === "cover" ? "背景已更新" : "头像已更新");
+    renderTripHub();
+    showToast(kind === "cover" ? "背景照片已更新" : "头像已更新");
+  } catch {
+    showToast("无法读取这张照片");
+  }
 }
 
 function saveTripForm() {
   const form = $("#trip-form");
   const data = new FormData(form);
+  const tripId = String(data.get("tripId") || "");
   const startDate = String(data.get("startDate"));
   const endDate = String(data.get("endDate"));
 
   if (new Date(`${endDate}T12:00:00`) < new Date(`${startDate}T12:00:00`)) {
     showToast("结束日期不能早于开始日期");
     return false;
+  }
+
+  if (tripId) {
+    state.name = String(data.get("name") || "").trim() || state.name || "未命名旅程";
+    state.destinations = String(data.get("destinations") || "").trim() || state.destinations || "待安排目的地";
+    state.routeLabels = makeRouteLabels(state.destinations, state.days);
+    syncTripDateRange(state, startDate, endDate);
+    state.days = applyDayDisplayNames(state.days, parseDayNames(data.get("dayNames"))).map(normalizeDay);
+    saveState("旅程资料已更新");
+    populateFormOptions();
+    renderHome();
+    renderItinerary();
+    renderWallet();
+    renderSaves();
+    renderWeather();
+    showToast("旅程资料已更新");
+    return true;
   }
 
   const trip = createBlankTrip(data);
@@ -1596,6 +1870,26 @@ function finishHtmlDrag() {
 }
 
 function handleClick(event) {
+  if (event.target.closest("#theme-toggle")) {
+    toggleTheme();
+    return;
+  }
+
+  if (event.target.closest("#change-cover-button")) {
+    $("#cover-input").click();
+    return;
+  }
+
+  if (event.target.closest("#change-avatar-button")) {
+    $("#avatar-input").click();
+    return;
+  }
+
+  if (event.target.closest("#edit-trip-button")) {
+    openTripModal("edit");
+    return;
+  }
+
   const nav = event.target.closest("[data-nav]");
   if (nav) {
     switchView(nav.dataset.nav);
@@ -1725,6 +2019,16 @@ function handleClick(event) {
 
 function setupForms() {
   $("#trip-select").addEventListener("change", event => switchTrip(event.target.value));
+
+  $("#cover-input").addEventListener("change", event => {
+    updateTripImage("cover", event.target.files?.[0]);
+    event.target.value = "";
+  });
+
+  $("#avatar-input").addEventListener("change", event => {
+    updateTripImage("avatar", event.target.files?.[0]);
+    event.target.value = "";
+  });
 
   $("#trip-form").addEventListener("submit", event => {
     event.preventDefault();
@@ -1860,6 +2164,7 @@ function setupLiquidGlassNavigation() {
 }
 
 function init() {
+  applyTheme(activeTheme);
   populateFormOptions();
   const capturedShare = captureIncomingShare();
   renderHome();

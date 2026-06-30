@@ -18,32 +18,47 @@
   </head>
   <body>
     <div class="app-shell">
-      <header class="topbar">
-        <a class="brand" href="#home" aria-label="旅行助手首页">
-          <span class="brand-mark">旅</span>
-          <span>
-            <strong>旅行助手</strong>
-            <small>Trip planner</small>
-          </span>
-        </a>
-      </header>
+      <div class="floating-controls" aria-label="显示设置">
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false" aria-label="切换暗黑模式">
+          <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4a7 7 0 1 0 11.5 11.5Z" /></svg>
+          <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" /></svg>
+          <span id="theme-toggle-label">夜间</span>
+        </button>
+      </div>
 
       <main id="app">
         <section class="view is-active" data-view="home" aria-label="旅行总览">
-          <section class="trip-hub panel">
-            <div>
-              <p class="eyebrow">MY TRIPS</p>
-              <h2 id="active-trip-name">旅行助手</h2>
-              <p id="active-trip-meta">选择一个旅程继续，或建立新的旅程。</p>
+          <section class="trip-hub trip-profile panel">
+            <div class="trip-cover">
+              <img id="trip-cover-image" alt="旅程背景照片" />
+              <div class="trip-cover-gradient" aria-hidden="true"></div>
+              <div class="trip-cover-actions">
+                <button class="cover-action" id="edit-trip-button" type="button">编辑资料</button>
+                <button class="cover-action" id="change-cover-button" type="button">更换背景</button>
+                <button class="cover-action" id="change-avatar-button" type="button">更换头像</button>
+              </div>
             </div>
-            <div class="trip-hub-actions">
-              <label class="trip-select-label">当前旅程
-                <select id="trip-select" aria-label="选择旅程"></select>
-              </label>
-              <button class="primary-button" id="new-trip-button" type="button">
-                <span>+</span> 新建旅程
-              </button>
+            <div class="trip-profile-body">
+              <div class="trip-avatar" aria-hidden="true">
+                <img id="trip-avatar-image" alt="" hidden />
+                <span id="trip-avatar-fallback">旅</span>
+              </div>
+              <div class="trip-profile-copy">
+                <p class="eyebrow">MY TRIPS</p>
+                <h2 id="active-trip-name">旅行助手</h2>
+                <p id="active-trip-meta">选择一个旅程继续，或建立新的旅程。</p>
+              </div>
+              <div class="trip-hub-actions">
+                <label class="trip-select-label">当前旅程
+                  <select id="trip-select" aria-label="选择旅程"></select>
+                </label>
+                <button class="primary-button" id="new-trip-button" type="button">
+                  <span>+</span> 新建旅程
+                </button>
+              </div>
             </div>
+            <input id="cover-input" type="file" accept="image/*" hidden />
+            <input id="avatar-input" type="file" accept="image/*" hidden />
           </section>
 
           <section class="next-card" id="next-card"></section>
@@ -208,15 +223,16 @@
       <form method="dialog" id="trip-form">
         <div class="modal-header">
           <div>
-            <p class="eyebrow">NEW TRIP</p>
-            <h2>建立新的旅程</h2>
+            <p class="eyebrow" id="trip-modal-eyebrow">NEW TRIP</p>
+            <h2 id="trip-modal-title">建立新的旅程</h2>
           </div>
           <button class="close-button" value="cancel" type="submit" formnovalidate aria-label="关闭">×</button>
         </div>
+        <input type="hidden" name="tripId" />
         <label>旅程名称
           <input name="name" placeholder="例如 Tokyo Autumn 2027" required />
         </label>
-        <label>目的地
+        <label>目的地显示
           <input name="destinations" placeholder="例如 Tokyo · Kyoto · Osaka" required />
         </label>
         <div class="form-row">
@@ -227,16 +243,16 @@
             <input name="endDate" type="date" required />
           </label>
         </div>
-        <label>旅途预算（RM，可之后再改）
+        <label id="trip-budget-label">旅途预算（RM，可之后再改）
           <input name="budget" inputmode="decimal" type="number" min="0" step="0.01" placeholder="例如 5000" />
         </label>
-        <label>首页标题
-          <input name="heroTitle" placeholder="例如 秋天的东京，从咖啡开始。" />
+        <label>每日显示名称（可选，一行一天）
+          <textarea name="dayNames" rows="4" placeholder="例如：&#10;Dubai 老城与日落&#10;抵达 Dolomites&#10;Braies + Tre Cime"></textarea>
         </label>
         <div class="modal-actions">
           <span class="modal-spacer"></span>
           <button class="secondary-button" value="cancel" type="submit" formnovalidate>取消</button>
-          <button class="primary-button" value="default" type="submit">建立旅程</button>
+          <button class="primary-button" id="trip-submit-button" value="default" type="submit">建立旅程</button>
         </div>
       </form>
     </dialog>
