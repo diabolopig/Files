@@ -1227,19 +1227,60 @@ main {
   font-size: 11px;
 }
 
-.day-meta-bar span {
+.day-meta-details {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.day-meta-details span {
   display: inline-flex;
+  min-width: 0;
   align-items: center;
   gap: 7px;
 }
 
+.day-meta-details span:last-child {
+  justify-content: flex-end;
+  text-align: right;
+}
+
 .day-meta-bar svg {
+  flex: 0 0 auto;
   width: 15px;
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.7;
+}
+
+.day-meta-bar .edit-day {
+  flex: 0 0 auto;
+  color: var(--muted);
+}
+
+:root[data-theme="dark"] .day-meta-bar {
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(243, 238, 229, 0.78);
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.07), transparent 42%),
+    linear-gradient(145deg, rgba(32, 42, 39, 0.9), rgba(17, 26, 24, 0.84)),
+    rgba(17, 26, 24, 0.78);
+}
+
+:root[data-theme="dark"] .day-meta-details span,
+:root[data-theme="dark"] .day-meta-bar svg {
+  color: rgba(243, 238, 229, 0.8);
+}
+
+:root[data-theme="dark"] .day-meta-bar .edit-day {
+  color: #fffaf2;
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.07);
 }
 
 .timeline {
@@ -2893,6 +2934,21 @@ main {
     flex-direction: column;
   }
 
+  .day-meta-details {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .day-meta-details span:last-child {
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .day-meta-bar .edit-day {
+    align-self: flex-end;
+  }
+
   .timeline-item {
     grid-template-columns: 57px 18px 1fr;
     gap: 9px;
@@ -3594,6 +3650,29 @@ main {
   border-top: 0;
   border-radius: 0 0 18px 18px;
   background: rgba(244, 240, 233, 0.58);
+}
+
+:root[data-theme="dark"] .day-meta-bar {
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(243, 238, 229, 0.8);
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.07), transparent 44%),
+    linear-gradient(145deg, rgba(32, 42, 39, 0.9), rgba(17, 26, 24, 0.84)),
+    rgba(17, 26, 24, 0.8);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset;
+}
+
+:root[data-theme="dark"] .day-meta-details span,
+:root[data-theme="dark"] .day-meta-bar svg {
+  color: rgba(243, 238, 229, 0.82);
+}
+
+:root[data-theme="dark"] .day-meta-bar .edit-day {
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #fffaf2;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04)),
+    rgba(255, 255, 255, 0.06);
 }
 
 .timeline-item {
@@ -6189,8 +6268,11 @@ function renderItinerary() {
           </button>
           <div class="day-content">
             <div class="day-meta-bar">
-              <span>${icons.pin}${fullDateFormatter.format(new Date(`${day.date}T12:00:00`))}</span>
-              <span>${icons.bed}${escapeHtml(day.stay)}</span>
+              <div class="day-meta-details">
+                <span>${icons.pin}${fullDateFormatter.format(new Date(`${day.date}T12:00:00`))}</span>
+                <span>${icons.bed}${escapeHtml(day.stay)}</span>
+              </div>
+              <button class="mini-button edit-day" type="button" data-day-id="${escapeHtml(day.id)}" title="编辑当天" aria-label="编辑当天">${icons.edit}</button>
             </div>
             <div class="timeline" data-day-id="${day.id}">
               ${day.items.map(item => renderTimelineItem(day, item)).join("")}
@@ -7326,6 +7408,36 @@ function finishHtmlDrag() {
   htmlDragState = null;
 }
 
+function editDayInfo(dayId) {
+  const day = state.days.find(entry => entry.id === dayId);
+  if (!day) return;
+
+  const nextName = window.prompt("修改当天显示名称", getDayDisplayName(day));
+  if (nextName === null) return;
+  const cleanName = nextName.trim();
+  if (!cleanName) {
+    showToast("请输入当天名称");
+    return;
+  }
+
+  const nextTheme = window.prompt("修改当天主题", day.theme || "");
+  if (nextTheme === null) return;
+  const cleanTheme = nextTheme.trim() || "自由安排";
+
+  const nextStay = window.prompt("修改住宿/集合点", day.stay || "");
+  if (nextStay === null) return;
+  const cleanStay = nextStay.trim() || "待安排住宿";
+
+  day.displayName = cleanName;
+  day.theme = cleanTheme;
+  day.stay = cleanStay;
+  saveState("当天资料已更新");
+  renderHome();
+  renderItinerary();
+  populateFormOptions();
+  showToast("当天资料已更新");
+}
+
 function handleClick(event) {
   if (event.target.closest("#theme-toggle")) {
     toggleTheme();
@@ -7387,6 +7499,12 @@ function handleClick(event) {
     else openDays.add(dayId);
     card.classList.toggle("is-open");
     daySummary.setAttribute("aria-expanded", card.classList.contains("is-open"));
+    return;
+  }
+
+  const editDay = event.target.closest(".edit-day");
+  if (editDay) {
+    editDayInfo(editDay.dataset.dayId);
     return;
   }
 

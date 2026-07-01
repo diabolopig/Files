@@ -979,8 +979,11 @@ function renderItinerary() {
           </button>
           <div class="day-content">
             <div class="day-meta-bar">
-              <span>${icons.pin}${fullDateFormatter.format(new Date(`${day.date}T12:00:00`))}</span>
-              <span>${icons.bed}${escapeHtml(day.stay)}</span>
+              <div class="day-meta-details">
+                <span>${icons.pin}${fullDateFormatter.format(new Date(`${day.date}T12:00:00`))}</span>
+                <span>${icons.bed}${escapeHtml(day.stay)}</span>
+              </div>
+              <button class="mini-button edit-day" type="button" data-day-id="${escapeHtml(day.id)}" title="编辑当天" aria-label="编辑当天">${icons.edit}</button>
             </div>
             <div class="timeline" data-day-id="${day.id}">
               ${day.items.map(item => renderTimelineItem(day, item)).join("")}
@@ -2116,6 +2119,36 @@ function finishHtmlDrag() {
   htmlDragState = null;
 }
 
+function editDayInfo(dayId) {
+  const day = state.days.find(entry => entry.id === dayId);
+  if (!day) return;
+
+  const nextName = window.prompt("修改当天显示名称", getDayDisplayName(day));
+  if (nextName === null) return;
+  const cleanName = nextName.trim();
+  if (!cleanName) {
+    showToast("请输入当天名称");
+    return;
+  }
+
+  const nextTheme = window.prompt("修改当天主题", day.theme || "");
+  if (nextTheme === null) return;
+  const cleanTheme = nextTheme.trim() || "自由安排";
+
+  const nextStay = window.prompt("修改住宿/集合点", day.stay || "");
+  if (nextStay === null) return;
+  const cleanStay = nextStay.trim() || "待安排住宿";
+
+  day.displayName = cleanName;
+  day.theme = cleanTheme;
+  day.stay = cleanStay;
+  saveState("当天资料已更新");
+  renderHome();
+  renderItinerary();
+  populateFormOptions();
+  showToast("当天资料已更新");
+}
+
 function handleClick(event) {
   if (event.target.closest("#theme-toggle")) {
     toggleTheme();
@@ -2177,6 +2210,12 @@ function handleClick(event) {
     else openDays.add(dayId);
     card.classList.toggle("is-open");
     daySummary.setAttribute("aria-expanded", card.classList.contains("is-open"));
+    return;
+  }
+
+  const editDay = event.target.closest(".edit-day");
+  if (editDay) {
+    editDayInfo(editDay.dataset.dayId);
     return;
   }
 

@@ -1215,19 +1215,60 @@ main {
   font-size: 11px;
 }
 
-.day-meta-bar span {
+.day-meta-details {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.day-meta-details span {
   display: inline-flex;
+  min-width: 0;
   align-items: center;
   gap: 7px;
 }
 
+.day-meta-details span:last-child {
+  justify-content: flex-end;
+  text-align: right;
+}
+
 .day-meta-bar svg {
+  flex: 0 0 auto;
   width: 15px;
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.7;
+}
+
+.day-meta-bar .edit-day {
+  flex: 0 0 auto;
+  color: var(--muted);
+}
+
+:root[data-theme="dark"] .day-meta-bar {
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(243, 238, 229, 0.78);
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.07), transparent 42%),
+    linear-gradient(145deg, rgba(32, 42, 39, 0.9), rgba(17, 26, 24, 0.84)),
+    rgba(17, 26, 24, 0.78);
+}
+
+:root[data-theme="dark"] .day-meta-details span,
+:root[data-theme="dark"] .day-meta-bar svg {
+  color: rgba(243, 238, 229, 0.8);
+}
+
+:root[data-theme="dark"] .day-meta-bar .edit-day {
+  color: #fffaf2;
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.07);
 }
 
 .timeline {
@@ -2879,6 +2920,21 @@ main {
   .day-meta-bar {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .day-meta-details {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .day-meta-details span:last-child {
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .day-meta-bar .edit-day {
+    align-self: flex-end;
   }
 
   .timeline-item {
