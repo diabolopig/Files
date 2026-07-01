@@ -23,6 +23,9 @@
   --photo-rgb: 76, 112, 104;
   --photo-soft-rgb: 160, 176, 168;
   --photo-deep-rgb: 36, 54, 50;
+  --on-image: #fffaf2;
+  --on-image-muted: rgba(255, 250, 242, 0.82);
+  --on-image-soft: rgba(255, 250, 242, 0.64);
   --scene-dubai-image: url("./assets/dubai-city-desert.jpg");
   --scene-dolomites-image: url("./assets/dolomites-meadow.jpg");
   --scene-venice-image: url("./assets/venice-gondola.jpg");
@@ -928,7 +931,7 @@ main {
 }
 
 .day-summary.has-image {
-  color: var(--white);
+  color: var(--on-image);
   background-color: var(--ink);
   background-image:
     linear-gradient(90deg, rgba(10, 38, 35, 0.93) 0%, rgba(10, 38, 35, 0.7) 55%, rgba(10, 38, 35, 0.28) 100%),
@@ -951,9 +954,17 @@ main {
   z-index: 1;
 }
 
+.day-summary.has-image .day-title strong,
+.day-summary.has-image .scene-name,
+.day-summary.has-image .day-summary-meta {
+  color: var(--on-image);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.48);
+}
+
 .day-summary.has-image .day-title span,
 .day-summary.has-image .day-weather {
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--on-image-muted);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.42);
 }
 
 .day-summary.has-image .day-weather svg {
@@ -967,12 +978,12 @@ main {
 }
 
 .day-summary.has-image .chevron::before {
-  border-color: var(--white);
+  border-color: var(--on-image);
 }
 
 .scene-name {
   display: none;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--on-image-soft);
   letter-spacing: 0.14em;
   font-size: 8px;
   font-weight: 700;

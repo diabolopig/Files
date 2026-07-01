@@ -1,4 +1,4 @@
-const CACHE_NAME = "trip-assistant-v13-dark-profile";
+const CACHE_NAME = "trip-assistant-v14-readable-day-cards";
 const APP_SHELL = [
   "./",
   "./index.html",
