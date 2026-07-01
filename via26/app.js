@@ -787,7 +787,7 @@ function renderHome() {
     `;
   }
 
-  $("#journey-heading").textContent = state.days.length ? `${state.days.length} 天，一条路线` : "还没有日期";
+  $("#journey-heading").textContent = "旅程路线";
   $("#journey-strip").innerHTML = state.days
     .map(
       day => `
