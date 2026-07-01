@@ -17,6 +17,7 @@ const DEFAULT_DAY_DISPLAY_NAMES = {
   "day-4": "Funes + Alpe di Siusi",
   "day-5": "Seceda + Ortisei"
 };
+const BUDGET_COLORS = ["#b79557", "#657f76", "#6e8d86", "#677f9e", "#4c7b78", "#a46d7b", "#c86b3c", "#58748f"];
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
 
@@ -575,6 +576,20 @@ function getBudgetCategoryStats(budget) {
   };
 }
 
+function createBudgetCategory({ name, limit }) {
+  const cleanName = String(name || "").trim();
+  const amount = Number(limit || 0);
+  if (!cleanName || !Number.isFinite(amount) || amount < 0) return null;
+
+  return {
+    id: `budget-${crypto.randomUUID()}`,
+    name: cleanName,
+    shortName: cleanName.length > 12 ? cleanName.slice(0, 12) : cleanName,
+    limit: Math.round(amount * 100) / 100,
+    color: BUDGET_COLORS[state.budgets.length % BUDGET_COLORS.length]
+  };
+}
+
 function extractFirstUrl(value) {
   const match = String(value || "").match(/https?:\/\/[^\s"'<>]+/i);
   return match ? match[0].replace(/[),.，。]+$/u, "") : "";
@@ -1130,6 +1145,7 @@ function renderWallet() {
             <p class="eyebrow">BY CATEGORY</p>
             <h2>预算分配</h2>
           </div>
+          <button class="text-button" id="add-budget-category-button" type="button">+ 新增分类</button>
         </div>
         <div class="budget-category-list">${budgetRows}</div>
       </section>
@@ -1691,6 +1707,31 @@ function openExpenseModal(categoryId = "") {
   setTimeout(() => form.elements.amount.focus(), 50);
 }
 
+function addBudgetCategory() {
+  const name = window.prompt("新增预算分类名称", "");
+  if (name === null) return;
+  const cleanName = name.trim();
+  if (!cleanName) {
+    showToast("请输入分类名称");
+    return;
+  }
+
+  const limitValue = window.prompt(`「${cleanName}」预算金额（RM）`, "0");
+  if (limitValue === null) return;
+  const budget = createBudgetCategory({ name: cleanName, limit: limitValue });
+  if (!budget) {
+    showToast("请输入有效预算金额");
+    return;
+  }
+
+  state.budgets.push(budget);
+  saveState("预算分类已新增");
+  populateFormOptions();
+  renderHome();
+  renderWallet();
+  showToast(`已新增 ${budget.name}`);
+}
+
 function saveExpenseForm() {
   const data = new FormData($("#expense-form"));
   state.expenses.push({
@@ -2029,6 +2070,11 @@ function handleClick(event) {
 
   if (event.target.closest("#add-checklist-button")) {
     addChecklistItem();
+    return;
+  }
+
+  if (event.target.closest("#add-budget-category-button")) {
+    addBudgetCategory();
     return;
   }
 

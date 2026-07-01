@@ -624,6 +624,7 @@ main {
   cursor: pointer;
   font-size: 12px;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .journey-strip {
