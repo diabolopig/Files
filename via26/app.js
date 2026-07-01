@@ -27,6 +27,7 @@ const icons = {
   bed: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19v-8m18 8v-6a2 2 0 0 0-2-2H8a3 3 0 0 0-3 3v5m0-4h16M8 11V8h4a2 2 0 0 1 2 2v1"/></svg>',
   pin: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>',
   next: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17 15 6m0 0H7m8 0v8"/><path d="M4 7v10h10"/></svg>',
+  calendar: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v3M17 3v3M4 9h16"/><path d="M6 5h12a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"/><path d="M8 13h3M8 16h5"/></svg>',
   cloud: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18h10a4 4 0 0 0 .35-7.98A6 6 0 0 0 6 12a3 3 0 0 0 1 6Z"/><path d="M8 6V3M4.5 7.5 2.5 5.5M13 5l1.5-2"/></svg>'
 };
 
@@ -636,6 +637,28 @@ function getLocalDateValue(date = new Date()) {
   return `${year}-${month}-${day}`;
 }
 
+function getTripStartDateValue() {
+  if (state.startDate) return state.startDate;
+  const dates = state.days.map(day => day.date).filter(Boolean).sort();
+  return dates[0] || "";
+}
+
+function getTripStartCountdown() {
+  const startDateValue = getTripStartDateValue();
+  if (!startDateValue) return null;
+
+  const today = new Date(`${getLocalDateValue()}T12:00:00`);
+  const start = new Date(`${startDateValue}T12:00:00`);
+  const days = Math.ceil((start.getTime() - today.getTime()) / 86400000);
+  if (days <= 0) return null;
+
+  return {
+    days,
+    start,
+    dateValue: startDateValue
+  };
+}
+
 function getTripDestinations() {
   return state.destinations || [...new Set(state.days.map(day => day.city).filter(Boolean))].join(" · ") || "待安排目的地";
 }
@@ -701,10 +724,29 @@ function renderHome() {
 
   const next = getNextPlan();
   const countdown = getCountdown(next?.start);
+  const tripStartCountdown = getTripStartCountdown();
   const nextCard = $("#next-card");
   const hasPlanItems = state.days.some(day => Array.isArray(day.items) && day.items.length);
 
-  if (!next && !hasPlanItems) {
+  if (tripStartCountdown) {
+    nextCard.innerHTML = `
+      <div class="next-icon">${icons.calendar}</div>
+      <div class="next-copy">
+        <small>你的旅程即将开始</small>
+        <h2>倒数 ${escapeHtml(tripStartCountdown.days)} 天</h2>
+        <p>还有 ${escapeHtml(tripStartCountdown.days)} 天出发 · ${escapeHtml(fullDateFormatter.format(tripStartCountdown.start))} · ${escapeHtml(getTripDestinations())}</p>
+      </div>
+      <div class="next-meta">
+        <div class="countdown">
+          <strong>${escapeHtml(tripStartCountdown.days)}</strong>
+          <span>天后出发</span>
+        </div>
+        <button class="map-button" data-go="itinerary" type="button">
+          ${icons.map} 查看行程
+        </button>
+      </div>
+    `;
+  } else if (!next && !hasPlanItems) {
     nextCard.innerHTML = `
       <div class="next-icon">${icons.next}</div>
       <div class="next-copy">
