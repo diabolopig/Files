@@ -564,9 +564,9 @@ function getBudgetStats() {
   };
 }
 
-function getBudgetCategoryStats(budget) {
+function getBudgetCategoryStats(budget, excludeExpenseId = "") {
   const spent = state.expenses
-    .filter(expense => expense.category === budget.id)
+    .filter(expense => expense.category === budget.id && expense.id !== excludeExpenseId)
     .reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
   const remaining = Number(budget.limit || 0) - spent;
   return {
@@ -1103,6 +1103,7 @@ function renderWallet() {
             <span>${escapeHtml(budget.shortName)} · ${escapeHtml(expense.date)}</span>
           </div>
           <strong class="expense-amount">${formatMoney(expense.amount)}</strong>
+          <button class="edit-expense" type="button" data-expense-id="${expense.id}" aria-label="编辑花费" title="编辑">${icons.edit}</button>
           <button class="delete-expense" type="button" data-expense-id="${expense.id}" aria-label="删除花费" title="删除">×</button>
         </div>
       `;
@@ -1158,15 +1159,8 @@ function renderWallet() {
         </div>
         <div class="expense-sections">
           <section class="expense-section">
-            <div class="expense-section-heading">
-              <div>
-                <span>TRIP ACTUALS</span>
-                <strong>旅途中实际花费</strong>
-              </div>
-              <em>${formatMoney(stats.tripSpent)}</em>
-            </div>
             <div class="expense-list">
-              ${expenseRows || '<div class="empty-state is-compact">还没有新增实际花费；点击预算分类里的 RM 金额框即可直接记录。</div>'}
+              ${expenseRows || '<div class="empty-state is-compact">还没有花费明细；点击预算分类里的 RM 金额框即可直接记录。</div>'}
             </div>
           </section>
           <section class="expense-section fixed-record-section">
@@ -1688,19 +1682,31 @@ function updateExpenseBudgetHint() {
   const hint = $("#expense-budget-hint");
   if (!budget || !hint) return;
 
-  const categoryStats = getBudgetCategoryStats(budget);
+  const categoryStats = getBudgetCategoryStats(budget, form.elements.expenseId.value);
   const enteredAmount = Number(form.elements.amount.value || 0);
   const projectedRemaining = categoryStats.remaining - enteredAmount;
   hint.textContent = `预算 ${formatMoney(budget.limit)} · 已花 ${formatMoney(categoryStats.spent)} · 这笔后剩余 ${formatMoney(projectedRemaining)}`;
   hint.classList.toggle("is-over", projectedRemaining < 0);
 }
 
-function openExpenseModal(categoryId = "") {
+function openExpenseModal(categoryId = "", expenseId = "") {
   const form = $("#expense-form");
+  const expense = expenseId ? state.expenses.find(entry => entry.id === expenseId) : null;
   form.reset();
-  form.elements.date.value = getLocalDateValue();
-  if (categoryId && state.budgets.some(budget => budget.id === categoryId)) {
-    form.elements.category.value = categoryId;
+  form.elements.expenseId.value = expense?.id || "";
+  $("#expense-modal-eyebrow").textContent = expense ? "EDIT EXPENSE" : "NEW EXPENSE";
+  $("#expense-modal-title").textContent = expense ? "编辑花费" : "记一笔花费";
+
+  if (expense) {
+    form.elements.amount.value = expense.amount;
+    form.elements.category.value = expense.category;
+    form.elements.date.value = expense.date;
+    form.elements.note.value = expense.note;
+  } else {
+    form.elements.date.value = getLocalDateValue();
+    if (categoryId && state.budgets.some(budget => budget.id === categoryId)) {
+      form.elements.category.value = categoryId;
+    }
   }
   updateExpenseBudgetHint();
   $("#expense-modal").showModal();
@@ -1734,17 +1740,21 @@ function addBudgetCategory() {
 
 function saveExpenseForm() {
   const data = new FormData($("#expense-form"));
-  state.expenses.push({
-    id: `expense-${crypto.randomUUID()}`,
+  const expenseId = String(data.get("expenseId") || "");
+  const nextExpense = {
+    id: expenseId || `expense-${crypto.randomUUID()}`,
     date: String(data.get("date")),
     category: String(data.get("category")),
     amount: Number(data.get("amount")),
     note: String(data.get("note")).trim()
-  });
+  };
+  const existingIndex = state.expenses.findIndex(expense => expense.id === expenseId);
+  if (existingIndex >= 0) state.expenses[existingIndex] = nextExpense;
+  else state.expenses.push(nextExpense);
   saveState();
   renderHome();
   renderWallet();
-  showToast("花费已记录");
+  showToast(expenseId ? "花费已更新" : "花费已记录");
 }
 
 function saveQuickExpenseForm(form) {
@@ -2168,6 +2178,12 @@ function handleClick(event) {
   const categoryExpense = event.target.closest("[data-add-expense-category]");
   if (categoryExpense) {
     openExpenseModal(categoryExpense.dataset.addExpenseCategory);
+    return;
+  }
+
+  const editExpense = event.target.closest(".edit-expense");
+  if (editExpense) {
+    openExpenseModal("", editExpense.dataset.expenseId);
     return;
   }
 

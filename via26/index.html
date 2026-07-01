@@ -262,11 +262,12 @@
       <form method="dialog" id="expense-form">
         <div class="modal-header">
           <div>
-            <p class="eyebrow">NEW EXPENSE</p>
-            <h2>记一笔花费</h2>
+            <p class="eyebrow" id="expense-modal-eyebrow">NEW EXPENSE</p>
+            <h2 id="expense-modal-title">记一笔花费</h2>
           </div>
           <button class="close-button" value="cancel" type="submit" formnovalidate aria-label="关闭">×</button>
         </div>
+        <input type="hidden" name="expenseId" />
         <div class="amount-field">
           <span>RM</span>
           <input name="amount" inputmode="decimal" type="number" min="0.01" step="0.01" placeholder="0.00" required />

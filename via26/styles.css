@@ -447,6 +447,7 @@ main {
 
 :root[data-theme="dark"] .empty-state.is-compact,
 :root[data-theme="dark"] .journey-day,
+:root[data-theme="dark"] .expense-row,
 :root[data-theme="dark"] .fixed-cost-row,
 :root[data-theme="dark"] .quick-save-form input,
 :root[data-theme="dark"] .quick-save-controls select {
@@ -1737,7 +1738,7 @@ main {
 
 .expense-list {
   display: grid;
-  gap: 10px;
+  gap: 9px;
 }
 
 .expense-sections {
@@ -1789,15 +1790,17 @@ main {
 
 .expense-row {
   display: grid;
-  padding: 13px 0;
-  border-bottom: 1px solid var(--line);
-  grid-template-columns: auto 1fr auto auto;
+  padding: 13px 14px;
+  border: 1px solid rgba(23, 63, 58, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.34);
+  grid-template-columns: auto 1fr auto auto auto;
   align-items: center;
   gap: 12px;
 }
 
 .expense-row:last-child {
-  border-bottom: 0;
+  border-bottom: 1px solid rgba(23, 63, 58, 0.08);
 }
 
 .expense-category-dot {
@@ -1827,15 +1830,32 @@ main {
   font-size: 15px;
 }
 
+.edit-expense,
 .delete-expense {
+  display: grid;
   width: 30px;
   height: 30px;
   border: 0;
-  border-radius: 9px;
+  border-radius: 11px;
   color: var(--muted);
   background: transparent;
   cursor: pointer;
   font-size: 17px;
+  place-items: center;
+}
+
+.edit-expense svg {
+  width: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.edit-expense:hover {
+  color: var(--orange-dark);
+  background: rgba(212, 119, 69, 0.08);
 }
 
 .delete-expense:hover {
@@ -1897,18 +1917,19 @@ main {
 .fixed-cost-list {
   display: grid;
   margin-top: 20px;
-  border-top: 1px solid var(--line);
+  gap: 8px;
 }
 
 .fixed-record-section .fixed-cost-list {
   margin-top: 0;
-  border-top: 0;
 }
 
 .fixed-cost-row {
   display: flex;
-  padding: 11px 0;
-  border-bottom: 1px solid var(--line);
+  padding: 13px 14px;
+  border: 1px solid rgba(23, 63, 58, 0.08);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.34);
   justify-content: space-between;
   gap: 16px;
   font-size: 11px;
@@ -2876,7 +2897,7 @@ main {
   }
 
   .expense-row {
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr) auto auto auto;
   }
 
   .expense-section-heading {
@@ -2897,8 +2918,9 @@ main {
     overflow-wrap: anywhere;
   }
 
+  .edit-expense,
   .delete-expense {
-    grid-column: 3;
+    grid-column: auto;
   }
 
   .save-capture {

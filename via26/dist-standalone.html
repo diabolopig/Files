@@ -459,6 +459,7 @@ main {
 
 :root[data-theme="dark"] .empty-state.is-compact,
 :root[data-theme="dark"] .journey-day,
+:root[data-theme="dark"] .expense-row,
 :root[data-theme="dark"] .fixed-cost-row,
 :root[data-theme="dark"] .quick-save-form input,
 :root[data-theme="dark"] .quick-save-controls select {
@@ -1749,7 +1750,7 @@ main {
 
 .expense-list {
   display: grid;
-  gap: 10px;
+  gap: 9px;
 }
 
 .expense-sections {
@@ -1801,15 +1802,17 @@ main {
 
 .expense-row {
   display: grid;
-  padding: 13px 0;
-  border-bottom: 1px solid var(--line);
-  grid-template-columns: auto 1fr auto auto;
+  padding: 13px 14px;
+  border: 1px solid rgba(23, 63, 58, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.34);
+  grid-template-columns: auto 1fr auto auto auto;
   align-items: center;
   gap: 12px;
 }
 
 .expense-row:last-child {
-  border-bottom: 0;
+  border-bottom: 1px solid rgba(23, 63, 58, 0.08);
 }
 
 .expense-category-dot {
@@ -1839,15 +1842,32 @@ main {
   font-size: 15px;
 }
 
+.edit-expense,
 .delete-expense {
+  display: grid;
   width: 30px;
   height: 30px;
   border: 0;
-  border-radius: 9px;
+  border-radius: 11px;
   color: var(--muted);
   background: transparent;
   cursor: pointer;
   font-size: 17px;
+  place-items: center;
+}
+
+.edit-expense svg {
+  width: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.edit-expense:hover {
+  color: var(--orange-dark);
+  background: rgba(212, 119, 69, 0.08);
 }
 
 .delete-expense:hover {
@@ -1909,18 +1929,19 @@ main {
 .fixed-cost-list {
   display: grid;
   margin-top: 20px;
-  border-top: 1px solid var(--line);
+  gap: 8px;
 }
 
 .fixed-record-section .fixed-cost-list {
   margin-top: 0;
-  border-top: 0;
 }
 
 .fixed-cost-row {
   display: flex;
-  padding: 11px 0;
-  border-bottom: 1px solid var(--line);
+  padding: 13px 14px;
+  border: 1px solid rgba(23, 63, 58, 0.08);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.34);
   justify-content: space-between;
   gap: 16px;
   font-size: 11px;
@@ -2888,7 +2909,7 @@ main {
   }
 
   .expense-row {
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr) auto auto auto;
   }
 
   .expense-section-heading {
@@ -2909,8 +2930,9 @@ main {
     overflow-wrap: anywhere;
   }
 
+  .edit-expense,
   .delete-expense {
-    grid-column: 3;
+    grid-column: auto;
   }
 
   .save-capture {
@@ -3854,8 +3876,9 @@ main {
 }
 
 .expense-row {
-  margin: 0 -4px;
-  padding: 13px 4px;
+  margin: 0;
+  padding: 13px 14px;
+  border-radius: 16px;
 }
 
 .expense-section {
@@ -4379,7 +4402,7 @@ main {
   }
 
   .expense-row {
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr) auto auto auto;
   }
 
   .weather-hero {
@@ -4787,11 +4810,12 @@ main {
       <form method="dialog" id="expense-form">
         <div class="modal-header">
           <div>
-            <p class="eyebrow">NEW EXPENSE</p>
-            <h2>记一笔花费</h2>
+            <p class="eyebrow" id="expense-modal-eyebrow">NEW EXPENSE</p>
+            <h2 id="expense-modal-title">记一笔花费</h2>
           </div>
           <button class="close-button" value="cancel" type="submit" formnovalidate aria-label="关闭">×</button>
         </div>
+        <input type="hidden" name="expenseId" />
         <div class="amount-field">
           <span>RM</span>
           <input name="amount" inputmode="decimal" type="number" min="0.01" step="0.01" placeholder="0.00" required />
@@ -5635,9 +5659,9 @@ function getBudgetStats() {
   };
 }
 
-function getBudgetCategoryStats(budget) {
+function getBudgetCategoryStats(budget, excludeExpenseId = "") {
   const spent = state.expenses
-    .filter(expense => expense.category === budget.id)
+    .filter(expense => expense.category === budget.id && expense.id !== excludeExpenseId)
     .reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
   const remaining = Number(budget.limit || 0) - spent;
   return {
@@ -6174,6 +6198,7 @@ function renderWallet() {
             <span>${escapeHtml(budget.shortName)} · ${escapeHtml(expense.date)}</span>
           </div>
           <strong class="expense-amount">${formatMoney(expense.amount)}</strong>
+          <button class="edit-expense" type="button" data-expense-id="${expense.id}" aria-label="编辑花费" title="编辑">${icons.edit}</button>
           <button class="delete-expense" type="button" data-expense-id="${expense.id}" aria-label="删除花费" title="删除">×</button>
         </div>
       `;
@@ -6229,15 +6254,8 @@ function renderWallet() {
         </div>
         <div class="expense-sections">
           <section class="expense-section">
-            <div class="expense-section-heading">
-              <div>
-                <span>TRIP ACTUALS</span>
-                <strong>旅途中实际花费</strong>
-              </div>
-              <em>${formatMoney(stats.tripSpent)}</em>
-            </div>
             <div class="expense-list">
-              ${expenseRows || '<div class="empty-state is-compact">还没有新增实际花费；点击预算分类里的 RM 金额框即可直接记录。</div>'}
+              ${expenseRows || '<div class="empty-state is-compact">还没有花费明细；点击预算分类里的 RM 金额框即可直接记录。</div>'}
             </div>
           </section>
           <section class="expense-section fixed-record-section">
@@ -6759,19 +6777,31 @@ function updateExpenseBudgetHint() {
   const hint = $("#expense-budget-hint");
   if (!budget || !hint) return;
 
-  const categoryStats = getBudgetCategoryStats(budget);
+  const categoryStats = getBudgetCategoryStats(budget, form.elements.expenseId.value);
   const enteredAmount = Number(form.elements.amount.value || 0);
   const projectedRemaining = categoryStats.remaining - enteredAmount;
   hint.textContent = `预算 ${formatMoney(budget.limit)} · 已花 ${formatMoney(categoryStats.spent)} · 这笔后剩余 ${formatMoney(projectedRemaining)}`;
   hint.classList.toggle("is-over", projectedRemaining < 0);
 }
 
-function openExpenseModal(categoryId = "") {
+function openExpenseModal(categoryId = "", expenseId = "") {
   const form = $("#expense-form");
+  const expense = expenseId ? state.expenses.find(entry => entry.id === expenseId) : null;
   form.reset();
-  form.elements.date.value = getLocalDateValue();
-  if (categoryId && state.budgets.some(budget => budget.id === categoryId)) {
-    form.elements.category.value = categoryId;
+  form.elements.expenseId.value = expense?.id || "";
+  $("#expense-modal-eyebrow").textContent = expense ? "EDIT EXPENSE" : "NEW EXPENSE";
+  $("#expense-modal-title").textContent = expense ? "编辑花费" : "记一笔花费";
+
+  if (expense) {
+    form.elements.amount.value = expense.amount;
+    form.elements.category.value = expense.category;
+    form.elements.date.value = expense.date;
+    form.elements.note.value = expense.note;
+  } else {
+    form.elements.date.value = getLocalDateValue();
+    if (categoryId && state.budgets.some(budget => budget.id === categoryId)) {
+      form.elements.category.value = categoryId;
+    }
   }
   updateExpenseBudgetHint();
   $("#expense-modal").showModal();
@@ -6805,17 +6835,21 @@ function addBudgetCategory() {
 
 function saveExpenseForm() {
   const data = new FormData($("#expense-form"));
-  state.expenses.push({
-    id: `expense-${crypto.randomUUID()}`,
+  const expenseId = String(data.get("expenseId") || "");
+  const nextExpense = {
+    id: expenseId || `expense-${crypto.randomUUID()}`,
     date: String(data.get("date")),
     category: String(data.get("category")),
     amount: Number(data.get("amount")),
     note: String(data.get("note")).trim()
-  });
+  };
+  const existingIndex = state.expenses.findIndex(expense => expense.id === expenseId);
+  if (existingIndex >= 0) state.expenses[existingIndex] = nextExpense;
+  else state.expenses.push(nextExpense);
   saveState();
   renderHome();
   renderWallet();
-  showToast("花费已记录");
+  showToast(expenseId ? "花费已更新" : "花费已记录");
 }
 
 function saveQuickExpenseForm(form) {
@@ -7239,6 +7273,12 @@ function handleClick(event) {
   const categoryExpense = event.target.closest("[data-add-expense-category]");
   if (categoryExpense) {
     openExpenseModal(categoryExpense.dataset.addExpenseCategory);
+    return;
+  }
+
+  const editExpense = event.target.closest(".edit-expense");
+  if (editExpense) {
+    openExpenseModal("", editExpense.dataset.expenseId);
     return;
   }
 

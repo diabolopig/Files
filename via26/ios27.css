@@ -866,8 +866,9 @@ main {
 }
 
 .expense-row {
-  margin: 0 -4px;
-  padding: 13px 4px;
+  margin: 0;
+  padding: 13px 14px;
+  border-radius: 16px;
 }
 
 .expense-section {
@@ -1391,7 +1392,7 @@ main {
   }
 
   .expense-row {
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr) auto auto auto;
   }
 
   .weather-hero {

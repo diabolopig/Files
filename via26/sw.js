@@ -1,4 +1,4 @@
-const CACHE_NAME = "trip-assistant-v20-add-budget-category";
+const CACHE_NAME = "trip-assistant-v21-edit-expenses";
 const APP_SHELL = [
   "./",
   "./index.html",
