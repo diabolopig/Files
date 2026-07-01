@@ -807,7 +807,7 @@ function renderHome() {
       <div class="budget-top">
         <div>
           <p class="eyebrow">TRIP WALLET</p>
-          <h2>预算还好吗？</h2>
+          <h2>预算钱包</h2>
         </div>
         <div class="budget-ring" style="--progress:${safePercent * 3.6}deg">
           <span>${Math.round(stats.percent)}%</span>
