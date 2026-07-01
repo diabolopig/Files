@@ -964,7 +964,10 @@ main {
 
 :root[data-theme="dark"] .budget-limit-button,
 :root[data-theme="dark"] .category-expense-button,
-:root[data-theme="dark"] .delete-expense {
+:root[data-theme="dark"] .edit-expense,
+:root[data-theme="dark"] .delete-expense,
+:root[data-theme="dark"] .edit-fixed-cost,
+:root[data-theme="dark"] .delete-fixed-cost {
   border-color: rgba(255, 255, 255, 0.1);
   color: var(--orange-dark);
   background: rgba(255, 255, 255, 0.07);

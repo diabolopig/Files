@@ -169,6 +169,21 @@ function normalizeChecklist(items = []) {
   return Array.isArray(items) ? items.map(normalizeChecklistItem) : [];
 }
 
+function normalizeFixedCosts(items = []) {
+  return Array.isArray(items)
+    ? items.map((item = {}, index) => {
+        const source = item && typeof item === "object" ? item : {};
+        const name = String(source.name || "已支付项目").trim() || "已支付项目";
+        const amount = Number(source.amount || 0);
+        return {
+          id: source.id || `fixed-${simpleHash(`${name}|${amount}|${index}`)}`,
+          name,
+          amount: Number.isFinite(amount) ? Math.round(amount * 100) / 100 : 0
+        };
+      })
+    : [];
+}
+
 function createChecklistItem() {
   return normalizeChecklistItem({
     id: `check-${crypto.randomUUID()}`,
@@ -193,7 +208,7 @@ function createDefaultTrip(saved = {}) {
     coverImage: saved.coverImage || getDefaultCoverImage(saved.destinations || "Dubai · Dolomites · Venice"),
     avatarImage: saved.avatarImage || "",
     days,
-    fixedCosts: Array.isArray(saved.fixedCosts) ? saved.fixedCosts : clone(defaultFixedCosts),
+    fixedCosts: normalizeFixedCosts(Array.isArray(saved.fixedCosts) ? saved.fixedCosts : clone(defaultFixedCosts)),
     budgets: Array.isArray(saved.budgets) ? saved.budgets : clone(defaultBudgets),
     expenses: migrateExpenses(saved.expenses || defaultExpenses),
     completed: Array.isArray(saved.completed) ? saved.completed : [],
@@ -300,7 +315,7 @@ function normalizeTrip(trip) {
     coverImage: trip.coverImage || getDefaultCoverImage(destinations),
     avatarImage: trip.avatarImage || "",
     days,
-    fixedCosts: Array.isArray(trip.fixedCosts) ? trip.fixedCosts : [],
+    fixedCosts: normalizeFixedCosts(trip.fixedCosts),
     budgets: Array.isArray(trip.budgets) ? trip.budgets : createTripBudgets(0),
     expenses: migrateExpenses(trip.expenses),
     completed: Array.isArray(trip.completed) ? trip.completed : [],
@@ -1084,9 +1099,13 @@ function renderWallet() {
 
   const fixedCostRows = state.fixedCosts
     .map(item => `
-      <div class="fixed-cost-row">
+      <div class="fixed-cost-row" data-fixed-cost-id="${escapeHtml(item.id)}">
         <span>${escapeHtml(item.name)}</span>
         <strong>${formatMoney(item.amount)}</strong>
+        <span class="fixed-cost-actions">
+          <button class="edit-fixed-cost" type="button" data-fixed-cost-id="${escapeHtml(item.id)}" aria-label="编辑已支付明细" title="编辑">${icons.edit}</button>
+          <button class="delete-fixed-cost" type="button" data-fixed-cost-id="${escapeHtml(item.id)}" aria-label="删除已支付明细" title="删除">×</button>
+        </span>
       </div>
     `)
     .join("");
@@ -1786,6 +1805,46 @@ function saveQuickExpenseForm(form) {
   showToast(`已记入 ${formatMoney(amount)}`);
 }
 
+function editFixedCost(fixedCostId) {
+  const item = state.fixedCosts.find(entry => entry.id === fixedCostId);
+  if (!item) return;
+
+  const nextName = window.prompt("修改已支付项目名称", item.name);
+  if (nextName === null) return;
+  const cleanName = nextName.trim();
+  if (!cleanName) {
+    showToast("请输入项目名称");
+    return;
+  }
+
+  const nextAmount = window.prompt(`修改「${cleanName}」金额（RM）`, String(item.amount));
+  if (nextAmount === null) return;
+  const amount = Number(nextAmount);
+  if (!Number.isFinite(amount) || amount < 0) {
+    showToast("请输入有效金额");
+    return;
+  }
+
+  item.name = cleanName;
+  item.amount = Math.round(amount * 100) / 100;
+  saveState("已支付明细已更新");
+  renderHome();
+  renderWallet();
+  showToast("已支付明细已更新");
+}
+
+function deleteFixedCost(fixedCostId) {
+  const item = state.fixedCosts.find(entry => entry.id === fixedCostId);
+  if (!item) return;
+  if (!window.confirm(`删除「${item.name}」？这会更新 Paid 总额。`)) return;
+
+  state.fixedCosts = state.fixedCosts.filter(entry => entry.id !== fixedCostId);
+  saveState("已支付明细已删除");
+  renderHome();
+  renderWallet();
+  showToast("已支付明细已删除");
+}
+
 function openSaveModal(saveId = null) {
   const modal = $("#save-modal");
   const form = $("#save-form");
@@ -2194,6 +2253,18 @@ function handleClick(event) {
     renderHome();
     renderWallet();
     showToast("花费已删除");
+    return;
+  }
+
+  const editFixedCostButton = event.target.closest(".edit-fixed-cost");
+  if (editFixedCostButton) {
+    editFixedCost(editFixedCostButton.dataset.fixedCostId);
+    return;
+  }
+
+  const deleteFixedCostButton = event.target.closest(".delete-fixed-cost");
+  if (deleteFixedCostButton) {
+    deleteFixedCost(deleteFixedCostButton.dataset.fixedCostId);
     return;
   }
 
