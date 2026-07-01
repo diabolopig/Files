@@ -9,7 +9,7 @@ import {
 } from "./data.js";
 
 const STORAGE_KEY = "via26-state-v1";
-const STATE_VERSION = 3;
+const STATE_VERSION = 4;
 const DEFAULT_TRIP_ID = "trip-dubai-dolomites-venice-2026";
 const WEATHER_KEY = "via26-weather-v1";
 const THEME_KEY = "via26-theme-v1";
@@ -136,6 +136,48 @@ function getDefaultCoverImage(destinations = "") {
   return "./assets/dolomites-meadow.jpg";
 }
 
+function simpleHash(value) {
+  let hash = 0;
+  for (const char of String(value)) hash = (Math.imul(hash, 31) + char.charCodeAt(0)) >>> 0;
+  return hash.toString(36);
+}
+
+function normalizeChecklistItem(item = {}, index = 0) {
+  const source = typeof item === "string" ? { title: item } : item && typeof item === "object" ? item : {};
+  const title = String(source.title || source.text || "新的待办事项").trim() || "新的待办事项";
+  const detail = String(source.detail || source.note || "").trim();
+  const status = String(source.status || "待处理").trim() || "待处理";
+  const date = String(source.date || "").trim();
+  const done = Boolean(source.done || source.completed || source.checked);
+  const fallbackId = `check-${simpleHash(`${title}|${detail}|${status}|${date}|${index}`)}`;
+
+  return {
+    id: source.id || fallbackId,
+    title,
+    detail,
+    status,
+    date,
+    done,
+    doneAt: done ? source.doneAt || source.completedAt || new Date().toISOString() : "",
+    createdAt: source.createdAt || new Date().toISOString(),
+    updatedAt: source.updatedAt || source.createdAt || new Date().toISOString()
+  };
+}
+
+function normalizeChecklist(items = []) {
+  return Array.isArray(items) ? items.map(normalizeChecklistItem) : [];
+}
+
+function createChecklistItem() {
+  return normalizeChecklistItem({
+    id: `check-${crypto.randomUUID()}`,
+    title: "新的待办事项",
+    detail: "",
+    status: "待处理",
+    createdAt: new Date().toISOString()
+  });
+}
+
 function createDefaultTrip(saved = {}) {
   const days = (Array.isArray(saved.days) ? saved.days : clone(defaultDays)).map(normalizeDay);
   return {
@@ -155,7 +197,7 @@ function createDefaultTrip(saved = {}) {
     expenses: migrateExpenses(saved.expenses || defaultExpenses),
     completed: Array.isArray(saved.completed) ? saved.completed : [],
     saves: Array.isArray(saved.saves) ? saved.saves : clone(defaultSaves),
-    reminders: Array.isArray(saved.reminders) ? saved.reminders : clone(bookingReminders),
+    reminders: normalizeChecklist(Array.isArray(saved.reminders) ? saved.reminders : clone(bookingReminders)),
     createdAt: saved.createdAt || new Date().toISOString()
   };
 }
@@ -262,7 +304,7 @@ function normalizeTrip(trip) {
     expenses: migrateExpenses(trip.expenses),
     completed: Array.isArray(trip.completed) ? trip.completed : [],
     saves: Array.isArray(trip.saves) ? trip.saves : [],
-    reminders: Array.isArray(trip.reminders) ? trip.reminders : [],
+    reminders: normalizeChecklist(trip.reminders),
     createdAt: trip.createdAt || new Date().toISOString()
   };
 }
@@ -329,6 +371,13 @@ const fullDateFormatter = new Intl.DateTimeFormat("zh-CN", {
   day: "numeric",
   weekday: "short"
 });
+
+function formatChecklistRecord(value) {
+  if (!value) return "未完成";
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return "已完成";
+  return `完成于 ${dateFormatter.format(date)}`;
+}
 
 function saveState(message = "已自动保存") {
   rootState.version = STATE_VERSION;
@@ -822,21 +871,29 @@ function renderHome() {
     <button class="primary-button" type="button" data-go="wallet">打开旅行钱包</button>
   `;
 
-  const reminders = Array.isArray(state.reminders) ? state.reminders : [];
+  const reminders = normalizeChecklist(state.reminders);
+  state.reminders = reminders;
   $("#reminder-list").innerHTML = reminders.length ? reminders
     .map(
       reminder => `
-        <article class="reminder">
-          <div class="reminder-top">
-            <span class="status" data-status="${escapeHtml(reminder.status)}">${escapeHtml(reminder.status)}</span>
-            <span class="reminder-date">${escapeHtml(reminder.date)}</span>
+        <article class="reminder checklist-item ${reminder.done ? "is-done" : ""}" data-reminder-id="${escapeHtml(reminder.id)}">
+          <label class="checklist-check" aria-label="完成 ${escapeHtml(reminder.title)}">
+            <input data-checklist-toggle type="checkbox" ${reminder.done ? "checked" : ""} />
+            <span aria-hidden="true">✓</span>
+          </label>
+          <div class="checklist-body">
+            <div class="reminder-top">
+              <span class="status" data-status="${escapeHtml(reminder.done ? "已完成" : reminder.status)}">${escapeHtml(reminder.done ? "已完成" : reminder.status)}</span>
+              ${reminder.date ? `<span class="reminder-date">${escapeHtml(reminder.date)}</span>` : ""}
+            </div>
+            <input class="checklist-title" data-checklist-field="title" value="${escapeHtml(reminder.title)}" placeholder="写下待办事项" aria-label="Check List 标题" />
+            <textarea class="checklist-detail" data-checklist-field="detail" rows="3" placeholder="备注、链接、预约编号或出发前要确认的事" aria-label="Check List 备注">${escapeHtml(reminder.detail)}</textarea>
+            <div class="checklist-record">${escapeHtml(formatChecklistRecord(reminder.doneAt))}</div>
           </div>
-          <h3>${escapeHtml(reminder.title)}</h3>
-          <p>${escapeHtml(reminder.detail)}</p>
         </article>
       `
     )
-    .join("") : '<div class="empty-state is-compact">这个旅程暂时没有固定预约事项。之后可以把重要事项加入每日行程或收藏备注。</div>';
+    .join("") : '<div class="empty-state is-compact">还没有 Check List。点右上角「+ 新增」写下要记住的事。</div>';
 }
 
 function getTripForecastForDay(day) {
@@ -1876,6 +1933,44 @@ function persistTimelineOrder(timeline, dayId) {
   showToast("行程顺序已调整");
 }
 
+function findChecklistItem(id) {
+  state.reminders = normalizeChecklist(state.reminders);
+  return state.reminders.find(item => item.id === id);
+}
+
+function addChecklistItem() {
+  const item = createChecklistItem();
+  state.reminders = [item, ...normalizeChecklist(state.reminders)];
+  saveState("Check List 已更新");
+  renderHome();
+  requestAnimationFrame(() => {
+    const title = document.querySelector(`[data-reminder-id="${item.id}"] [data-checklist-field="title"]`);
+    title?.focus();
+    title?.select();
+  });
+}
+
+function toggleChecklistItem(id, done) {
+  const item = findChecklistItem(id);
+  if (!item) return;
+  item.done = done;
+  item.doneAt = done ? new Date().toISOString() : "";
+  item.updatedAt = new Date().toISOString();
+  saveState("Check List 已更新");
+  renderHome();
+}
+
+function updateChecklistField(field) {
+  const card = field.closest("[data-reminder-id]");
+  const item = findChecklistItem(card?.dataset.reminderId);
+  if (!item) return;
+  const key = field.dataset.checklistField;
+  if (!["title", "detail"].includes(key)) return;
+  item[key] = field.value;
+  item.updatedAt = new Date().toISOString();
+  saveState("Check List 已保存");
+}
+
 function startHtmlDrag(event) {
   const handle = event.target.closest(".drag-handle");
   if (!handle) return;
@@ -1929,6 +2024,11 @@ function handleClick(event) {
 
   if (event.target.closest("#edit-trip-button")) {
     openTripModal("edit");
+    return;
+  }
+
+  if (event.target.closest("#add-checklist-button")) {
+    addChecklistItem();
     return;
   }
 
@@ -2057,6 +2157,18 @@ function handleClick(event) {
   if (event.target.closest("#refresh-weather-button")) {
     refreshWeather(true);
   }
+}
+
+function handleInput(event) {
+  const field = event.target.closest("[data-checklist-field]");
+  if (field) updateChecklistField(field);
+}
+
+function handleChange(event) {
+  const toggle = event.target.closest("[data-checklist-toggle]");
+  if (!toggle) return;
+  const card = toggle.closest("[data-reminder-id]");
+  toggleChecklistItem(card?.dataset.reminderId, toggle.checked);
 }
 
 function setupForms() {
@@ -2220,6 +2332,8 @@ function init() {
   switchView(capturedShare ? "saves" : activeView, false);
 
   document.addEventListener("click", handleClick);
+  document.addEventListener("input", handleInput);
+  document.addEventListener("change", handleChange);
   document.addEventListener("pointerdown", event => {
     const handle = event.target.closest(".drag-handle");
     if (handle) startDrag(event, handle);
