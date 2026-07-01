@@ -897,6 +897,79 @@ main {
   background: rgba(244, 240, 233, 0.7);
 }
 
+:root[data-theme="dark"] .wallet-overview-card {
+  border-color: rgba(255, 255, 255, 0.12);
+  background:
+    radial-gradient(circle at 50% -18%, rgba(var(--photo-rgb), 0.22), transparent 42%),
+    linear-gradient(145deg, rgba(20, 28, 26, 0.94), rgba(12, 18, 17, 0.88)),
+    rgba(12, 18, 17, 0.82);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.09) inset,
+    0 24px 70px rgba(0, 0, 0, 0.32);
+}
+
+:root[data-theme="dark"] .wallet-overview-card::after {
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 42px rgba(255, 255, 255, 0.025);
+}
+
+:root[data-theme="dark"] .wallet-overview-copy > span,
+:root[data-theme="dark"] .wallet-overview-copy small,
+:root[data-theme="dark"] .wallet-overview-metrics span,
+:root[data-theme="dark"] .wallet-overview-metrics small,
+:root[data-theme="dark"] .budget-category-title small,
+:root[data-theme="dark"] .budget-category-footer span,
+:root[data-theme="dark"] .quick-amount-field span {
+  color: rgba(243, 238, 229, 0.72);
+}
+
+:root[data-theme="dark"] .wallet-overview-copy strong,
+:root[data-theme="dark"] .wallet-overview-metrics strong,
+:root[data-theme="dark"] .budget-category-title strong,
+:root[data-theme="dark"] .budget-category-numbers strong,
+:root[data-theme="dark"] .expense-copy strong,
+:root[data-theme="dark"] .fixed-cost-row strong {
+  color: #fffaf2;
+}
+
+:root[data-theme="dark"] .wallet-overview-metrics article,
+:root[data-theme="dark"] .budget-category,
+:root[data-theme="dark"] .quick-amount-field,
+:root[data-theme="dark"] .expense-section,
+:root[data-theme="dark"] .expense-row,
+:root[data-theme="dark"] .fixed-cost-row {
+  border-color: rgba(255, 255, 255, 0.12);
+  background:
+    radial-gradient(circle at 22% 0%, rgba(255, 255, 255, 0.08), transparent 42%),
+    linear-gradient(145deg, rgba(32, 42, 39, 0.86), rgba(17, 26, 24, 0.78)),
+    rgba(17, 26, 24, 0.72);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+:root[data-theme="dark"] .quick-amount-field input {
+  color: #fffaf2;
+}
+
+:root[data-theme="dark"] .quick-amount-field input::placeholder {
+  color: rgba(255, 250, 242, 0.42);
+  opacity: 1;
+}
+
+:root[data-theme="dark"] .wallet-health-meter {
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22) inset;
+}
+
+:root[data-theme="dark"] .budget-limit-button,
+:root[data-theme="dark"] .category-expense-button,
+:root[data-theme="dark"] .delete-expense {
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--orange-dark);
+  background: rgba(255, 255, 255, 0.07);
+}
+
 .fixed-cost-panel summary {
   min-height: 48px;
 }
